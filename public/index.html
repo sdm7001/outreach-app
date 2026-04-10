@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2563eb">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Outreach</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;height:100dvh;overflow:hidden}
+
+/* Gate */
+#gate{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;z-index:100}
+#gate.hidden{display:none}
+.gate-icon{width:60px;height:60px;background:#2563eb;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.gate-icon svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gate-title{font-size:24px;font-weight:700;color:#0f172a;letter-spacing:-.3px}
+.gate-sub{font-size:14px;color:#94a3b8;margin-top:4px;margin-bottom:32px}
+.gate-form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px}
+.field label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:5px}
+
+/* Inputs */
+input,select,textarea{
+  width:100%;padding:13px 14px;border:1.5px solid #e2e8f0;border-radius:10px;
+  font-size:16px;color:#0f172a;background:#fff;outline:none;
+  -webkit-appearance:none;appearance:none;font-family:inherit;transition:border-color .15s
+}
+input:focus,select:focus,textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+input::placeholder{color:#cbd5e1}
+textarea{resize:none;height:80px}
+
+/* Buttons */
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:active{background:#1d4ed8}
+.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-secondary{background:#f1f5f9;color:#374151;font-size:14px;padding:10px 16px;width:auto}
+.btn-secondary:active{background:#e2e8f0}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px;font-weight:500;border:none;cursor:pointer;font-family:inherit}
+.btn-outline{background:#fff;border:1.5px solid #e2e8f0;color:#374151}
+.btn-outline:active{background:#f8fafc}
+.btn-danger-outline{background:#fff;border:1.5px solid #fecaca;color:#dc2626}
+
+/* App shell */
+#app{display:none;height:100dvh}
+#app.visible{display:flex;flex-direction:row;overflow:hidden}
+
+/* Sidebar desktop */
+#sidebar{
+  width:220px;min-width:220px;background:#fff;border-right:1px solid #e2e8f0;
+  display:none;flex-direction:column;padding:18px 10px 18px;
+}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:16px}
+.sb-logo-dot{width:32px;height:32px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-dot svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-logo-text{font-size:16px;font-weight:700;color:#0f172a}
+.sb-nav{flex:1;display:flex;flex-direction:column;gap:2px}
+.ni{display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#64748b;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:all .15s}
+.ni:hover{background:#f8fafc;color:#334155}
+.ni.active{background:#eff6ff;color:#2563eb}
+.ni svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-footer{border-top:1px solid #f1f5f9;padding-top:10px;margin-top:10px}
+
+/* Main content */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(76px + env(safe-area-inset-bottom));background:#f1f5f9}
+
+/* Bottom nav mobile */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50
+}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;
+  cursor:pointer;border:none;background:none;color:#94a3b8;font-size:10px;font-weight:500;font-family:inherit;transition:color .15s}
+.bn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bn.active{color:#2563eb}
+
+/* Desktop breakpoint */
+@media(min-width:768px){
+  #sidebar{display:flex}
+  #bottom-nav{display:none}
+  #content{padding:28px 32px}
+}
+
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-.3px;margin-bottom:16px}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(min-width:768px){.kpi-grid{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px}
+.kpi-label{font-size:12px;color:#64748b;font-weight:500;margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:700;color:#0f172a;line-height:1}
+.kpi-sub{font-size:11px;color:#94a3b8;margin-top:4px}
+
+/* Cards */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.card-head{padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
+.card-head-title{font-size:15px;font-weight:600;color:#0f172a}
+.card-body{padding:16px}
+
+/* Prospect cards */
+.pc{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.pc-name{font-size:15px;font-weight:600;color:#0f172a}
+.pc-meta{font-size:12px;color:#94a3b8;margin-top:2px}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-pending{background:#f8fafc;color:#64748b}
+.b-sent{background:#eff6ff;color:#2563eb}
+.b-opened{background:#f0fdf4;color:#16a34a}
+.b-clicked{background:#f0fdf4;color:#16a34a}
+.b-replied{background:#fef9c3;color:#854d0e}
+.b-bounced{background:#fef2f2;color:#dc2626}
+.b-unsubscribed{background:#f8fafc;color:#94a3b8}
+.b-default{background:#f1f5f9;color:#64748b}
+.pc-score{font-size:12px;color:#64748b}
+.pc-email{font-size:13px;color:#64748b;word-break:break-all}
+.pc-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* Recent list */
+.rl-item{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f8fafc}
+.rl-item:last-child{border-bottom:none}
+.rl-name{font-size:14px;font-weight:500;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.rl-co{font-size:12px;color:#94a3b8}
+
+/* Search */
+.search-wrap{margin-bottom:14px;position:relative}
+.search-wrap input{padding-left:36px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#94a3b8}
+.search-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Filter row */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.filter-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:#64748b;font-family:inherit;transition:all .15s}
+.filter-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+
+/* Config form */
+.cfg-section{margin-bottom:20px}
+.cfg-title{font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.cfg-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.cfg-grid{grid-template-columns:1fr 1fr}}
+.cfg-field label{font-size:13px;font-weight:500;color:#374151;display:block;margin-bottom:4px}
+.test-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.test-result{font-size:12px;margin-top:4px}
+.test-ok{color:#16a34a}
+.test-fail{color:#dc2626}
+
+/* Alert */
+.alert{padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:12px}
+.alert-error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.alert-success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.alert-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+
+/* Loading */
+.spinner{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;margin:40px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 24px;color:#94a3b8;font-size:14px}
+
+/* Pager */
+.pager{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;gap:8px}
+.pager-info{font-size:13px;color:#94a3b8}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.overlay{align-items:center}}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:22px 20px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto}
+@media(min-width:640px){.modal{border-radius:16px;padding:24px;max-height:85vh}}
+.modal-title{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:18px}
+.form-stack{display:flex;flex-direction:column;gap:12px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:10px;margin-top:4px}
+.modal-actions .btn{flex:1}
+
+/* Divider */
+hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
+</style>
+</head>
+<body>
+
+<!-- GATE -->
+<div id="gate">
+  <div class="gate-icon">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="gate-title">Outreach</div>
+  <div class="gate-sub">TexMG Sales Intelligence</div>
+  <form class="gate-form" id="loginForm">
+    <div id="loginAlert"></div>
+    <div class="field">
+      <label>Admin Password</label>
+      <input type="password" id="loginPw" placeholder="Enter password" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
+  </form>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- Sidebar (desktop) -->
+  <nav id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-dot">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <span class="sb-logo-text">Outreach</span>
+    </div>
+    <div class="sb-nav">
+      <button class="ni active" data-p="dashboard" onclick="nav('dashboard')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="ni" data-p="prospects" onclick="nav('prospects')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Prospects
+      </button>
+      <button class="ni" data-p="admin" onclick="nav('admin')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Settings
+      </button>
+    </div>
+    <div class="sb-footer">
+      <button class="ni" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main id="content">
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title">Dashboard</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Total Prospects</div><div class="kpi-value" id="k-total">—</div></div>
+        <div class="kpi"><div class="kpi-label">Emails Sent</div><div class="kpi-value" id="k-sent">—</div></div>
+        <div class="kpi"><div class="kpi-label">Open Rate</div><div class="kpi-value" id="k-open">—</div><div class="kpi-sub">30-day avg</div></div>
+        <div class="kpi"><div class="kpi-label">Reply Rate</div><div class="kpi-value" id="k-reply">—</div><div class="kpi-sub">30-day avg</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-head-title">Today</span>
+          <span id="today-date" style="font-size:12px;color:#94a3b8"></span>
+        </div>
+        <div id="today-stats" class="card-body">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-head-title">Recent Prospects</span>
+          <button class="btn-sm btn-outline" onclick="nav('prospects')">View all</button>
+        </div>
+        <div id="recent-list"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-primary" id="runBtn" onclick="runPipeline()" style="font-size:14px;padding:12px">Run Pipeline Now</button>
+      </div>
+    </div>
+
+    <!-- Prospects -->
+    <div id="page-prospects" class="page">
+      <div class="page-title">Prospects</div>
+      <div class="search-wrap">
+        <div class="search-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <input type="search" id="searchInput" placeholder="Search by name, company, email..." oninput="doSearch()">
+      </div>
+      <div class="filter-row" id="filterRow">
+        <button class="filter-btn active" data-status="all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" data-status="pending" onclick="setFilter('pending')">Pending</button>
+        <button class="filter-btn" data-status="sent" onclick="setFilter('sent')">Sent</button>
+        <button class="filter-btn" data-status="opened" onclick="setFilter('opened')">Opened</button>
+        <button class="filter-btn" data-status="replied" onclick="setFilter('replied')">Replied</button>
+        <button class="filter-btn" data-status="bounced" onclick="setFilter('bounced')">Bounced</button>
+      </div>
+      <div id="prospects-list"></div>
+      <div class="pager" id="pager" style="display:none">
+        <button class="btn-sm btn-outline" id="prevBtn" onclick="changePage(-1)">Previous</button>
+        <span class="pager-info" id="pager-info"></span>
+        <button class="btn-sm btn-outline" id="nextBtn" onclick="changePage(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Admin / Settings -->
+    <div id="page-admin" class="page">
+      <div class="page-title">Settings</div>
+      <div class="card" id="cfg-card">
+        <div class="card-head"><span class="card-head-title">Configuration</span></div>
+        <div class="card-body">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-head-title">Connection Tests</span></div>
+        <div class="card-body" id="test-section">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;font-weight:500;color:#374151">Claude (Anthropic)</span>
+                <button class="btn-sm btn-outline" onclick="testSvc('anthropic')">Test</button>
+              </div>
+              <div id="test-anthropic" class="test-result"></div>
+            </div>
+            <hr>
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;font-weight:500;color:#374151">Apollo.io</span>
+                <button class="btn-sm btn-outline" onclick="testSvc('apollo')">Test</button>
+              </div>
+              <div id="test-apollo" class="test-result"></div>
+            </div>
+            <hr>
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;font-weight:500;color:#374151">Hunter.io</span>
+                <button class="btn-sm btn-outline" onclick="testSvc('hunter')">Test</button>
+              </div>
+              <div id="test-hunter" class="test-result"></div>
+            </div>
+            <hr>
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;font-weight:500;color:#374151">SMTP (Gmail)</span>
+                <button class="btn-sm btn-outline" onclick="testSvc('smtp')">Test</button>
+              </div>
+              <div id="test-smtp" class="test-result"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Nav (mobile) -->
+  <nav id="bottom-nav">
+    <button class="bn active" data-p="dashboard" onclick="nav('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Home
+    </button>
+    <button class="bn" data-p="prospects" onclick="nav('prospects')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Prospects
+    </button>
+    <button class="bn" data-p="admin" onclick="nav('admin')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Settings
+    </button>
+  </nav>
+
+</div>
+
+<!-- Modal overlay -->
+<div id="overlay" class="overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<script>
+const API = '/api';
+let _token = localStorage.getItem('outreach_token');
+let _filter = 'all';
+let _page = 1;
+let _total = 0;
+const LIMIT = 20;
+
+// Escape HTML
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+function badgeClass(s){
+  const m={pending:'b-pending',sent:'b-sent',opened:'b-opened',clicked:'b-clicked',replied:'b-replied',bounced:'b-bounced',unsubscribed:'b-unsubscribed'};
+  return m[(s||'').toLowerCase()]||'b-default';
+}
+
+// Auth
+document.getElementById('loginForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var btn=document.getElementById('loginBtn'), alrt=document.getElementById('loginAlert');
+  btn.disabled=true; btn.textContent='Signing in...'; alrt.innerHTML='';
+  try{
+    var r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:document.getElementById('loginPw').value})});
+    var d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Invalid password');
+    _token=d.token||d.accessToken;
+    localStorage.setItem('outreach_token',_token);
+    showApp();
+  }catch(err){
+    alrt.innerHTML='<div class="alert alert-error">'+esc(err.message)+'</div>';
+    btn.disabled=false; btn.textContent='Sign In';
+  }
+});
+
+function logout(){
+  localStorage.removeItem('outreach_token');
+  _token=null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('gate').classList.remove('hidden');
+  document.getElementById('loginPw').value='';
+}
+
+// API helper
+async function apiFetch(path, opts){
+  opts=opts||{};
+  var r=await fetch(API+path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+_token},opts.headers||{})}));
+  if(r.status===401){logout();throw new Error('Session expired');}
+  if(!r.ok){var d=await r.json().catch(function(){return{};});throw new Error(d.error||d.message||'Request failed');}
+  return r.json();
+}
+
+function showApp(){
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  loadDashboard();
+  loadProspects();
+  loadConfig();
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+// Navigation
+function nav(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.ni,.bn').forEach(function(el){el.classList.toggle('active',el.dataset.p===page);});
+  document.getElementById('content').scrollTo(0,0);
+}
+
+// Dashboard
+async function loadDashboard(){
+  try{
+    var d=await apiFetch('/stats');
+    var t=d.totals||{};
+    document.getElementById('k-total').textContent=t.total_prospects||0;
+    document.getElementById('k-sent').textContent=t.total_sent||0;
+    document.getElementById('k-open').textContent=(t.open_rate||'0')+'%';
+    document.getElementById('k-reply').textContent=(t.reply_rate||'0')+'%';
+
+    // Today stats
+    var today=d.today||{};
+    document.getElementById('today-stats').innerHTML=
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#0f172a">'+(today.prospects_found||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Found</div></div>'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#2563eb">'+(today.emails_sent||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Sent</div></div>'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">'+(today.replies||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Replies</div></div>'+
+      '</div>';
+
+    // Recent
+    var recent=d.recent||[];
+    if(recent.length){
+      document.getElementById('recent-list').innerHTML=recent.slice(0,8).map(function(p){
+        return '<div class="rl-item">'+
+          '<div><div class="rl-name">'+esc(p.contact_name||'Unknown')+'</div><div class="rl-co">'+esc(p.company_name||'')+'</div></div>'+
+          '<span class="badge '+badgeClass(p.status)+'">'+esc(p.status||'pending')+'</span>'+
+          '</div>';
+      }).join('');
+    } else {
+      document.getElementById('recent-list').innerHTML='<div class="empty">No prospects yet.<br>Run the pipeline to get started.</div>';
+    }
+  }catch(e){
+    document.getElementById('today-stats').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+}
+
+// Pipeline
+async function runPipeline(){
+  var btn=document.getElementById('runBtn');
+  btn.disabled=true; btn.textContent='Running...';
+  try{
+    var d=await apiFetch('/pipeline/run',{method:'POST'});
+    btn.textContent='Pipeline Started!';
+    setTimeout(function(){btn.disabled=false;btn.textContent='Run Pipeline Now';loadDashboard();loadProspects();},3000);
+  }catch(e){
+    alert('Error: '+e.message);
+    btn.disabled=false; btn.textContent='Run Pipeline Now';
+  }
+}
+
+// Prospects
+async function loadProspects(){
+  var c=document.getElementById('prospects-list');
+  c.innerHTML='<div class="spinner"></div>';
+  try{
+    var params=new URLSearchParams({page:_page,limit:LIMIT});
+    if(_filter&&_filter!=='all') params.set('status',_filter);
+    var q=document.getElementById('searchInput');
+    if(q&&q.value.trim()) params.set('search',q.value.trim());
+    var d=await apiFetch('/prospects?'+params.toString());
+    var rows=d.prospects||[];
+    _total=d.total||0;
+    var pages=Math.ceil(_total/LIMIT);
+    if(!rows.length){
+      c.innerHTML='<div class="empty">No prospects found</div>';
+      document.getElementById('pager').style.display='none';
+      return;
+    }
+    c.innerHTML=rows.map(function(p){
+      var name=esc(p.contact_name||'Unknown');
+      var score=p.score?'Score: '+p.score:'';
+      var email=p.contact_email||'';
+      return '<div class="pc">'+
+        '<div class="pc-top">'+
+          '<div>'+
+            '<div class="pc-name">'+name+'</div>'+
+            '<div class="pc-meta">'+esc(p.company_name||'')+(score?' &middot; '+score:'')+'</div>'+
+          '</div>'+
+          '<span class="badge '+badgeClass(p.status)+'">'+esc(p.status||'pending')+'</span>'+
+        '</div>'+
+        (email?'<div class="pc-email">'+esc(email)+'</div>':'')+
+        '<div class="pc-actions">'+
+          '<button class="btn-sm btn-outline" onclick="showProspect('+JSON.stringify(p)+')">Details</button>'+
+          (email?'<button class="btn-sm btn-outline" onclick="copyEmail(\''+esc(email)+'\')">Copy Email</button>':'')+
+        '</div>'+
+      '</div>';
+    }).join('');
+    // Pager
+    if(pages>1){
+      document.getElementById('pager').style.display='flex';
+      document.getElementById('pager-info').textContent='Page '+_page+' of '+pages+' ('+_total+' total)';
+      document.getElementById('prevBtn').disabled=_page<=1;
+      document.getElementById('nextBtn').disabled=_page>=pages;
+    } else {
+      document.getElementById('pager').style.display='none';
+    }
+  }catch(e){
+    c.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+}
+
+function setFilter(s){
+  _filter=s; _page=1;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.toggle('active',b.dataset.status===s);});
+  loadProspects();
+}
+
+var _searchTimer;
+function doSearch(){clearTimeout(_searchTimer);_searchTimer=setTimeout(function(){_page=1;loadProspects();},350);}
+
+function changePage(d){_page+=d;loadProspects();}
+
+function copyEmail(email){
+  navigator.clipboard.writeText(email).then(function(){showToast('Email copied!');}).catch(function(){alert(email);});
+}
+
+function showProspect(p){
+  var fields=[
+    ['Company',p.company_name],['Contact',p.contact_name],['Email',p.contact_email],
+    ['Title',p.contact_title],['Industry',p.industry],['Status',p.status],
+    ['Score',p.score],['Sent',p.sent_at?new Date(p.sent_at).toLocaleDateString():'—'],
+    ['Opened',p.opened_at?new Date(p.opened_at).toLocaleDateString():'—'],
+    ['Replied',p.replied_at?new Date(p.replied_at).toLocaleDateString():'—']
+  ].filter(function(f){return f[1];});
+  document.getElementById('modal-body').innerHTML=
+    '<div class="modal-title">'+esc(p.contact_name||p.company_name||'Prospect')+'</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px">'+
+    fields.map(function(f){return '<div><div style="font-size:11px;color:#94a3b8;font-weight:500;margin-bottom:2px">'+esc(f[0].toUpperCase())+'</div><div style="font-size:14px;color:#0f172a">'+esc(f[1])+'</div></div>';}).join('')+
+    '</div>'+
+    '<div class="modal-actions" style="margin-top:16px"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>';
+  document.getElementById('overlay').style.display='flex';
+}
+
+// Config
+async function loadConfig(){
+  try{
+    var d=await apiFetch('/admin/config');
+    var fields=[
+      {group:'API Keys',items:[
+        {k:'ANTHROPIC_API_KEY',label:'Anthropic API Key',type:'password'},
+        {k:'APOLLO_API_KEY',label:'Apollo.io API Key',type:'password'},
+        {k:'HUNTER_API_KEY',label:'Hunter.io API Key',type:'password'},
+      ]},
+      {group:'Email (SMTP)',items:[
+        {k:'SMTP_USER',label:'Gmail Address',type:'text'},
+        {k:'SMTP_PASS',label:'Gmail App Password',type:'password'},
+        {k:'FROM_NAME',label:'From Name',type:'text'},
+        {k:'FROM_EMAIL',label:'From Email',type:'email'},
+      ]},
+      {group:'Pipeline Settings',items:[
+        {k:'TARGET_INDUSTRIES',label:'Target Industries (comma-separated)',type:'text'},
+        {k:'TARGET_CITIES',label:'Target Cities (comma-separated)',type:'text'},
+        {k:'DAILY_PROSPECT_LIMIT',label:'Prospects Per Day',type:'number'},
+        {k:'EMAILS_PER_DAY',label:'Emails Per Day',type:'number'},
+        {k:'SEND_WINDOW_START',label:'Send Window Start (hour 0-23)',type:'number'},
+        {k:'SEND_WINDOW_END',label:'Send Window End (hour 0-23)',type:'number'},
+      ]},
+      {group:'Security',items:[
+        {k:'ADMIN_PASSWORD',label:'Admin Password',type:'password'},
+      ]},
+    ];
+
+    var html='<div id="cfg-alert"></div><div style="display:flex;flex-direction:column;gap:20px">';
+    fields.forEach(function(g){
+      html+='<div><div class="cfg-title">'+esc(g.group)+'</div><div class="cfg-grid">';
+      g.items.forEach(function(f){
+        html+='<div class="cfg-field"><label>'+esc(f.label)+'</label>'+
+          '<input type="'+f.type+'" data-key="'+f.k+'" value="'+esc(d[f.k]||'')+'" placeholder="'+(f.type==='password'?'unchanged':'')+'" class="cfg-input"></div>';
+      });
+      html+='</div></div>';
+    });
+    html+='</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="saveConfig()" id="saveBtn">Save Settings</button></div>';
+
+    document.querySelector('#cfg-card .card-body').innerHTML=html;
+  }catch(e){
+    document.querySelector('#cfg-card .card-body').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+}
+
+async function saveConfig(){
+  var btn=document.getElementById('saveBtn');
+  var alrt=document.getElementById('cfg-alert');
+  btn.disabled=true; btn.textContent='Saving...'; alrt.innerHTML='';
+  try{
+    var updates={};
+    document.querySelectorAll('.cfg-input').forEach(function(el){
+      var v=el.value.trim();
+      if(v) updates[el.dataset.key]=v;
+    });
+    var d=await apiFetch('/admin/config',{method:'POST',body:JSON.stringify(updates)});
+    alrt.innerHTML='<div class="alert alert-success">'+esc(d.status||'Saved!')+'</div>';
+  }catch(e){
+    alrt.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+  btn.disabled=false; btn.textContent='Save Settings';
+}
+
+async function testSvc(svc){
+  var el=document.getElementById('test-'+svc);
+  el.innerHTML='<span style="color:#94a3b8;font-size:12px">Testing...</span>';
+  try{
+    var d=await apiFetch('/admin/test/'+svc,{method:'POST',body:'{}'});
+    el.innerHTML='<span class="'+(d.success?'test-ok':'test-fail')+'">'+esc(d.message)+'</span>';
+  }catch(e){
+    el.innerHTML='<span class="test-fail">'+esc(e.message)+'</span>';
+  }
+}
+
+// Modal
+function closeModal(){document.getElementById('overlay').style.display='none';}
+
+// Toast
+var _toastTimer;
+function showToast(msg){
+  var t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;white-space:nowrap';document.body.appendChild(t);}
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(_toastTimer);_toastTimer=setTimeout(function(){t.style.display='none';},2500);
+}
+
+// Init
+(async function(){
+  if(_token){
+    try{
+      // Quick validation: fetch stats to test token
+      await apiFetch('/stats');
+      showApp();
+    }catch(e){
+      localStorage.removeItem('outreach_token');
+      _token=null;
+    }
+  }
+})();
+</script>
+</body>
+</html>
