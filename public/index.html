@@ -1907,6 +1907,10 @@ async function runProspectSearch() {
     const d = await apiFetch('/prospects/search', { method: 'POST', body: JSON.stringify({ industries, locations, titles, keywords, source }) });
     _psResults = d.results || [];
     _psSearchId = d.searchId;
+    const warnings = d.warnings || [];
+    document.getElementById('ps-alert').innerHTML = warnings.length
+      ? warnings.map(w=>`<div class="alert alert-info">${esc(w)}</div>`).join('')
+      : '';
     document.getElementById('ps-result-count').textContent = `${_psResults.length} results`;
     document.getElementById('ps-results-wrap').style.display = 'block';
     renderSearchResults(_psResults);

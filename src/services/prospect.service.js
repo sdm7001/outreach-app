@@ -42,33 +42,51 @@ async function searchProspects(query, userId) {
   `).run(searchId, userId || null, queryJson, source, now);
 
   let results = [];
+  const warnings = [];
 
   try {
-    if ((source === 'apollo' || source === 'both') && config.APOLLO_API_KEY) {
-      const apolloResults = await _searchViaApollo({ industries, locations, titles, keywords }, config);
-      results = results.concat(apolloResults);
+    const apolloRequested = source === 'apollo' || source === 'both';
+    const placesRequested = source === 'places' || source === 'both';
+
+    if (apolloRequested && !config.APOLLO_API_KEY) {
+      warnings.push('Apollo.io API key not configured — skipping Apollo search');
+    }
+    if (placesRequested && !config.GOOGLE_PLACES_API_KEY) {
+      warnings.push('Google Places API key not configured — skipping Places search');
     }
 
-    if ((source === 'places' || source === 'both') && config.GOOGLE_PLACES_API_KEY) {
-      const placesResults = await _searchViaPlaces({ industries, locations, keywords }, config);
-      results = results.concat(placesResults);
+    if (apolloRequested && config.APOLLO_API_KEY) {
+      try {
+        const apolloResults = await _searchViaApollo({ industries, locations, titles, keywords }, config);
+        results = results.concat(apolloResults);
+      } catch (apolloErr) {
+        const msg = apolloErr.response?.data?.message || apolloErr.response?.data?.error || apolloErr.message;
+        warnings.push(`Apollo search failed: ${msg}`);
+        logger.warn('Apollo search error', { searchId, error: msg });
+      }
     }
 
-    // If no API keys, return empty array gracefully
-    if (!config.APOLLO_API_KEY && !config.GOOGLE_PLACES_API_KEY) {
-      logger.info('Prospect search: no API keys configured, returning empty', { searchId });
+    if (placesRequested && config.GOOGLE_PLACES_API_KEY) {
+      try {
+        const placesResults = await _searchViaPlaces({ industries, locations, keywords }, config);
+        results = results.concat(placesResults);
+      } catch (placesErr) {
+        const msg = placesErr.response?.data?.error_message || placesErr.message;
+        warnings.push(`Google Places search failed: ${msg}`);
+        logger.warn('Places search error', { searchId, error: msg });
+      }
     }
 
     db.prepare('UPDATE prospect_searches SET status = ?, result_count = ? WHERE id = ?')
       .run('completed', results.length, searchId);
 
-    logger.info('Prospect search completed', { searchId, count: results.length, source });
-    return { searchId, results };
+    logger.info('Prospect search completed', { searchId, count: results.length, source, warnings });
+    return { searchId, results, warnings };
 
   } catch (err) {
     db.prepare('UPDATE prospect_searches SET status = ? WHERE id = ?').run('failed', searchId);
     logger.error('Prospect search failed', { searchId, error: err.message });
-    throw err;
+    throw new ValidationError(`Prospect search failed: ${err.message}`);
   }
 }
 

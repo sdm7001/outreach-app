@@ -13,8 +13,8 @@ router.use(requireAuth);
 
 // POST /prospects/search — run a prospect search
 router.post('/search', requireRole('operator'), asyncHandler(async (req, res) => {
-  const { searchId, results } = await prospectService.searchProspects(req.body, req.user.id);
-  res.json({ searchId, results, count: results.length });
+  const { searchId, results, warnings } = await prospectService.searchProspects(req.body, req.user.id);
+  res.json({ searchId, results, count: results.length, warnings });
 }));
 
 // POST /prospects/search/:id/save — save search results to pool
