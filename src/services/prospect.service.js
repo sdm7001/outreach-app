@@ -105,7 +105,7 @@ async function _searchViaApollo({ industries, locations, titles, keywords }, con
     page: 1,
   };
 
-  const res = await axios.post('https://api.apollo.io/v1/mixed_people/search', body, {
+  const res = await axios.post('https://api.apollo.io/v1/people/search', body, {
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
