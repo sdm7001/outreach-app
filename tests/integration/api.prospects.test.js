@@ -39,6 +39,51 @@ describe('POST /api/v1/prospects/search', () => {
   });
 });
 
+// ── POST /search/:id/save ─────────────────────────────────────────────────
+
+describe('POST /api/v1/prospects/search/:id/save', () => {
+  it('saves search results to the prospect pool', async () => {
+    // Create a search record first
+    const searchRes = await supertest(app)
+      .post('/api/v1/prospects/search')
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({ source: 'apollo' });
+    const searchId = searchRes.body.searchId;
+
+    const results = [
+      { first_name: 'Alice', last_name: 'Smith', email: 'alice@corp.com', title: 'CEO', source: 'apollo' },
+      { first_name: 'Bob', last_name: 'Jones', email: 'bob@corp.com', title: 'CTO', source: 'apollo' },
+    ];
+
+    const res = await supertest(app)
+      .post(`/api/v1/prospects/search/${searchId}/save`)
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({ results });
+    expect(res.status).toBe(200);
+    expect(res.body.saved).toBe(2);
+
+    // Verify they appear in the pool
+    const list = await supertest(app)
+      .get('/api/v1/prospects')
+      .set('Authorization', `Bearer ${opToken}`);
+    expect(list.body.total).toBeGreaterThanOrEqual(2);
+  });
+
+  it('returns 400 when results array is missing', async () => {
+    const searchRes = await supertest(app)
+      .post('/api/v1/prospects/search')
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({ source: 'apollo' });
+    const searchId = searchRes.body.searchId;
+
+    const res = await supertest(app)
+      .post(`/api/v1/prospects/search/${searchId}/save`)
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({});
+    expect(res.status).toBe(400);
+  });
+});
+
 // ── POST / (add one to pool) ──────────────────────────────────────────────
 
 describe('POST /api/v1/prospects', () => {

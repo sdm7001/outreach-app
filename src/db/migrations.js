@@ -478,6 +478,21 @@ const MIGRATIONS = [
       }
     }
   },
+  {
+    version: 9,
+    description: 'Prospect pool email uniqueness, draft rejection reason',
+    up(db) {
+      db.exec(`
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_prospect_pool_email_unique
+          ON prospect_pool(email) WHERE email IS NOT NULL;
+      `);
+
+      const draftCols = db.prepare('PRAGMA table_info(message_drafts)').all().map(c => c.name);
+      if (!draftCols.includes('rejection_reason')) {
+        db.exec('ALTER TABLE message_drafts ADD COLUMN rejection_reason TEXT');
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {

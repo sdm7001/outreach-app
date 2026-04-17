@@ -152,8 +152,8 @@ function rejectDraft(id, userId, reason) {
 
   const now = new Date().toISOString();
   db.prepare(`
-    UPDATE message_drafts SET status = 'rejected', reviewed_by = ?, reviewed_at = ? WHERE id = ?
-  `).run(userId || null, now, id);
+    UPDATE message_drafts SET status = 'rejected', reviewed_by = ?, reviewed_at = ?, rejection_reason = ? WHERE id = ?
+  `).run(userId || null, now, reason || null, id);
 
   logger.info('Draft rejected', { id, userId, reason });
   return getDraft(id);
@@ -173,11 +173,14 @@ function editDraft(id, { subject, body }, userId) {
   const spamScore = computeSpamScore(newSubject, newBody);
   const now = new Date().toISOString();
 
+  // Editing an approved draft resets it to pending_review — content changed, must re-approve
+  const newStatus = existing.status === 'approved' ? 'pending_review' : existing.status;
+
   db.prepare(`
     UPDATE message_drafts
-    SET subject = ?, body = ?, spam_score = ?, reviewed_by = ?, reviewed_at = ?
+    SET subject = ?, body = ?, spam_score = ?, status = ?, reviewed_by = ?, reviewed_at = ?
     WHERE id = ?
-  `).run(newSubject, newBody, spamScore, userId || null, now, id);
+  `).run(newSubject, newBody, spamScore, newStatus, userId || null, now, id);
 
   return getDraft(id);
 }

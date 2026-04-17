@@ -343,18 +343,13 @@ router.get('/:id/sequence', asyncHandler(async (req, res) => {
 // GET /campaigns/:id/readiness
 router.get('/:id/readiness', asyncHandler(async (req, res) => {
   const db = require('../db').getDb();
+  const draftService = require('../services/draft.service');
   const campaignId = req.params.id;
 
-  // Ensure campaign exists
   campaignService.getCampaignRaw(campaignId);
 
   const contactCount = db.prepare('SELECT COUNT(*) as cnt FROM contacts WHERE campaign_id = ?').get(campaignId).cnt;
-  const draftStats = {
-    total: db.prepare('SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ?').get(campaignId).cnt,
-    pending_review: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'pending_review'").get(campaignId).cnt,
-    approved: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'approved'").get(campaignId).cnt,
-    rejected: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'rejected'").get(campaignId).cnt,
-  };
+  const draftStats = draftService.getDraftStats(campaignId);
 
   const reasons = [];
   if (contactCount === 0) reasons.push('No contacts assigned to this campaign');

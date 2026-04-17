@@ -19,7 +19,6 @@
  *   stage        — run a specific stage only
  */
 
-const { v4: uuidv4 } = require('uuid');
 const { getDb } = require('../db');
 const { enqueue } = require('../workers/queue');
 const { isSuppress } = require('./compliance.service');
@@ -28,6 +27,7 @@ const {
   getSequenceForCampaign, isExcluded, updateCampaign,
 } = require('./campaign.service');
 const { ValidationError } = require('../utils/errors');
+const { bulkApproveSafe } = require('./draft.service');
 const logger = require('../utils/logger');
 
 // ── PUBLIC ENTRY POINTS ───────────────────────────────────────────────────
@@ -89,6 +89,19 @@ async function runStage(campaignId, stage, { triggeredBy, triggeredByEmail, dryR
   if (!validStages.includes(stage)) throw new Error(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`);
 
   const campaign = getCampaignRaw(campaignId);
+
+  // Guard: sending stage must not run while drafts are still pending review
+  if (stage === 'send' && !dryRun) {
+    const db = getDb();
+    const pendingDrafts = db.prepare(
+      "SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'pending_review'"
+    ).get(campaignId).cnt;
+    if (pendingDrafts > 0) {
+      throw new ValidationError(
+        'All drafts must be reviewed before sending. Use the Content Review workflow to approve or reject pending drafts.'
+      );
+    }
+  }
 
   const run = createRun(campaignId, {
     runType: dryRun ? 'dry_run' : 'stage',
@@ -343,30 +356,7 @@ async function requeueFailedJobs(campaignId, runId) {
  * Approve all safe pending drafts for a campaign (spam_score below threshold).
  */
 function approveAllSafeDrafts(campaignId, { spamThreshold = 5, approvedBy } = {}) {
-  const db = getDb();
-  const now = new Date().toISOString();
-
-  const drafts = db.prepare(`
-    SELECT id FROM message_drafts
-    WHERE campaign_id = ? AND status = 'pending_review' AND spam_score <= ?
-  `).all(campaignId, spamThreshold);
-
-  let count = 0;
-  for (const draft of drafts) {
-    db.prepare("UPDATE message_drafts SET status='approved', reviewed_by=?, reviewed_at=? WHERE id=?")
-      .run(approvedBy || null, now, draft.id);
-
-    enqueue('send_email', {
-      draftId: draft.id,
-      campaignId,
-    }, {
-      idempotencyKey: `send:${draft.id}`,
-    });
-    count++;
-  }
-
-  logger.info('Bulk approved safe drafts', { campaignId, count, spamThreshold });
-  return count;
+  return bulkApproveSafe(campaignId, { spamThreshold, userId: approvedBy });
 }
 
 /**

@@ -1,6 +1,7 @@
 'use strict';
 
 const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 const { getDb } = require('../db');
 const { getConfig } = require('../config');
 const { NotFoundError, ValidationError } = require('../utils/errors');
@@ -70,6 +71,10 @@ async function searchProspects(query, userId) {
       try {
         const placesResults = await _searchViaPlaces({ industries, locations, keywords }, config);
         results = results.concat(placesResults);
+        const emailless = placesResults.filter(p => !p.email).length;
+        if (emailless > 0) {
+          warnings.push(`${emailless} Google Places result(s) have no email address — enrich manually before assigning to a campaign`);
+        }
       } catch (placesErr) {
         const msg = placesErr.response?.data?.error_message || placesErr.message;
         warnings.push(`Google Places search failed: ${msg}`);
@@ -90,12 +95,12 @@ async function searchProspects(query, userId) {
   }
 }
 
-async function _searchViaApollo({ industries: _industries, locations, titles, keywords }, config) {
-  const axios = require('axios');
+async function _searchViaApollo({ industries, locations, titles, keywords }, config) {
   const body = {
     api_key: config.APOLLO_API_KEY,
     person_titles: (titles || []).slice(0, 5),
     q_organization_locations: (locations || []).slice(0, 3),
+    q_organization_industries: (industries || []).slice(0, 5),
     q_keywords: (keywords || []).join(' ') || undefined,
     num_requested: 25,
     page: 1,
@@ -124,7 +129,6 @@ async function _searchViaApollo({ industries: _industries, locations, titles, ke
 }
 
 async function _searchViaPlaces({ industries, locations, keywords }, config) {
-  const axios = require('axios');
   const query = [...(keywords || []), ...(industries || []), ...(locations || [])].join(' ');
   if (!query.trim()) return [];
 
@@ -354,7 +358,8 @@ function assignToCampaign(prospectIds, campaignId, userId) {
     for (const pid of ids) {
       const prospect = db.prepare('SELECT * FROM prospect_pool WHERE id = ?').get(pid);
       if (!prospect) continue;
-      if (prospect.status === 'rejected') continue; // skip rejected
+      if (prospect.status === 'rejected') continue;
+      if (prospect.status === 'assigned') continue; // already in a campaign, skip duplicate
 
       const contactId = uuidv4();
       insertContact.run(

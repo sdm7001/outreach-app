@@ -5,7 +5,7 @@ require('../setup');
 const supertest = require('supertest');
 const app = require('../../server');
 const { getDb, closeDb } = require('../../src/db');
-const { createAdmin, createUser } = require('../fixtures/factory');
+const { createAdmin, createUser, createCampaign, createContact, createDraft } = require('../fixtures/factory');
 
 let db, adminToken, opToken;
 
@@ -17,7 +17,11 @@ beforeAll(async () => {
   opToken = (await supertest(app).post('/api/v1/auth/login').send({ email: op.email, password: op.password })).body.token;
 });
 afterAll(() => { closeDb(); });
-beforeEach(() => { db.prepare('DELETE FROM campaigns').run(); });
+beforeEach(() => {
+  db.prepare('DELETE FROM message_drafts').run();
+  db.prepare('DELETE FROM contacts').run();
+  db.prepare('DELETE FROM campaigns').run();
+});
 
 describe('GET /api/v1/campaigns', () => {
   it('returns empty list when no campaigns', async () => {
@@ -97,5 +101,40 @@ describe('DELETE /api/v1/campaigns/:id', () => {
     expect(del.status).toBe(200);
     const check = await supertest(app).get(`/api/v1/campaigns/${id}`).set('Authorization', `Bearer ${adminToken}`);
     expect(check.body.status).toBe('archived');
+  });
+});
+
+// ── Run guard: pending drafts block campaign execution ─────────────────────
+
+describe('POST /api/v1/campaigns/:id/run — pending-draft guard', () => {
+  let guardCampaign, guardContact;
+
+  beforeEach(() => {
+    db.prepare('DELETE FROM message_drafts').run();
+    db.prepare('DELETE FROM contacts').run();
+    db.prepare('DELETE FROM campaigns').run();
+    guardCampaign = createCampaign(db, { name: 'Guard Test', status: 'active' });
+    guardContact = createContact(db, { campaign_id: guardCampaign.id });
+  });
+
+  it('returns 400 when pending_review drafts exist', async () => {
+    createDraft(db, { contact_id: guardContact.id, campaign_id: guardCampaign.id, status: 'pending_review' });
+
+    const res = await supertest(app)
+      .post(`/api/v1/campaigns/${guardCampaign.id}/run`)
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({});
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/pending/i);
+  });
+
+  it('allows run when all drafts are approved', async () => {
+    createDraft(db, { contact_id: guardContact.id, campaign_id: guardCampaign.id, status: 'approved' });
+
+    const res = await supertest(app)
+      .post(`/api/v1/campaigns/${guardCampaign.id}/run`)
+      .set('Authorization', `Bearer ${opToken}`)
+      .send({});
+    expect([200, 202]).toContain(res.status);
   });
 });
