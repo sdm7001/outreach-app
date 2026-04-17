@@ -338,4 +338,33 @@ router.get('/:id/sequence', asyncHandler(async (req, res) => {
   res.json(sequence || null);
 }));
 
+// ── READINESS ─────────────────────────────────────────────────────────────
+
+// GET /campaigns/:id/readiness
+router.get('/:id/readiness', asyncHandler(async (req, res) => {
+  const db = require('../db').getDb();
+  const campaignId = req.params.id;
+
+  // Ensure campaign exists
+  campaignService.getCampaignRaw(campaignId);
+
+  const contactCount = db.prepare('SELECT COUNT(*) as cnt FROM contacts WHERE campaign_id = ?').get(campaignId).cnt;
+  const draftStats = {
+    total: db.prepare('SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ?').get(campaignId).cnt,
+    pending_review: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'pending_review'").get(campaignId).cnt,
+    approved: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'approved'").get(campaignId).cnt,
+    rejected: db.prepare("SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'rejected'").get(campaignId).cnt,
+  };
+
+  const reasons = [];
+  if (contactCount === 0) reasons.push('No contacts assigned to this campaign');
+  if (draftStats.total === 0) reasons.push('No drafts have been generated');
+  if (draftStats.pending_review > 0) reasons.push(`${draftStats.pending_review} draft(s) still pending review`);
+  if (draftStats.total > 0 && draftStats.approved === 0) reasons.push('No drafts have been approved');
+
+  const can_run = reasons.length === 0;
+
+  res.json({ can_run, reasons, draft_stats: draftStats, contact_count: contactCount });
+}));
+
 module.exports = router;

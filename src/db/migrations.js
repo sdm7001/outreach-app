@@ -427,6 +427,57 @@ const MIGRATIONS = [
       }
     }
   },
+  {
+    version: 8,
+    description: 'Prospect searches and prospect pool',
+    up(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS prospect_searches (
+          id TEXT PRIMARY KEY,
+          user_id TEXT REFERENCES users(id),
+          query TEXT NOT NULL DEFAULT '{}',
+          source TEXT NOT NULL DEFAULT 'apollo',
+          status TEXT NOT NULL DEFAULT 'completed',
+          result_count INTEGER DEFAULT 0,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_prospect_searches_user ON prospect_searches(user_id);
+        CREATE INDEX IF NOT EXISTS idx_prospect_searches_created ON prospect_searches(created_at);
+
+        CREATE TABLE IF NOT EXISTS prospect_pool (
+          id TEXT PRIMARY KEY,
+          search_id TEXT REFERENCES prospect_searches(id),
+          user_id TEXT REFERENCES users(id),
+          first_name TEXT,
+          last_name TEXT,
+          email TEXT,
+          title TEXT,
+          company_name TEXT,
+          industry TEXT,
+          city TEXT,
+          state TEXT,
+          country TEXT,
+          linkedin_url TEXT,
+          phone TEXT,
+          source TEXT DEFAULT 'manual',
+          tags TEXT DEFAULT '[]',
+          notes TEXT,
+          status TEXT NOT NULL DEFAULT 'pending',
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_prospect_pool_status ON prospect_pool(status);
+        CREATE INDEX IF NOT EXISTS idx_prospect_pool_user ON prospect_pool(user_id);
+        CREATE INDEX IF NOT EXISTS idx_prospect_pool_email ON prospect_pool(email);
+      `);
+
+      // Add prospect_pool_id to contacts if missing
+      const contactCols = db.prepare('PRAGMA table_info(contacts)').all().map(c => c.name);
+      if (!contactCols.includes('prospect_pool_id')) {
+        db.exec('ALTER TABLE contacts ADD COLUMN prospect_pool_id TEXT');
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {

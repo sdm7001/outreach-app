@@ -184,6 +184,9 @@ hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
       <button class="ni" data-p="suppression" onclick="nav('suppression')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Suppression</button>
       <button class="ni" data-p="senders" onclick="nav('senders')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Senders</button>
       <button class="ni" data-p="audit" onclick="nav('audit')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Audit Log</button>
+      <button class="ni" data-p="prospect-search" onclick="nav('prospect-search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Prospect Search</button>
+      <button class="ni" data-p="prospect-pool" onclick="nav('prospect-pool')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Prospect Pool</button>
+      <button class="ni" data-p="content-review" onclick="nav('content-review')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Content Review</button>
       <button class="ni" data-p="jobs" onclick="nav('jobs')"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Jobs</button>
     </div>
     <div class="sb-footer">
@@ -357,6 +360,115 @@ hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
       <div id="jobs-list"></div>
     </div>
 
+    <!-- Prospect Search -->
+    <div id="page-prospect-search" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Prospect Search</div>
+        <button class="btn-sm btn-outline" onclick="loadSavedSearches()">Refresh</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-head-title">Search Parameters</span></div>
+        <div class="card-body">
+          <div class="form-stack">
+            <div id="ps-alert"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="field"><label>Industries (comma-separated)</label><input id="ps-industries" placeholder="Healthcare, Technology"></div>
+              <div class="field"><label>Locations (comma-separated)</label><input id="ps-locations" placeholder="Houston TX, Austin TX"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="field"><label>Job Titles (comma-separated)</label><input id="ps-titles" placeholder="CEO, Practice Manager"></div>
+              <div class="field"><label>Keywords</label><input id="ps-keywords" placeholder="managed IT, healthcare"></div>
+            </div>
+            <div class="field"><label>Source</label>
+              <div style="display:flex;gap:16px;padding:4px 0">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="ps-source" value="apollo" checked style="width:auto;padding:0;border:none"> Apollo.io</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="ps-source" value="places" style="width:auto;padding:0;border:none"> Google Places</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="ps-source" value="both" style="width:auto;padding:0;border:none"> Both</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="runProspectSearch()" id="ps-btn">Search Prospects</button>
+          </div>
+        </div>
+      </div>
+      <div id="ps-results-wrap" style="display:none">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-head-title" id="ps-result-count">Results</span>
+            <button class="btn-sm btn-primary" onclick="addAllToPool()">Add All to Pool</button>
+          </div>
+          <div id="ps-results-table"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <div class="card-head"><span class="card-head-title">Saved Searches</span></div>
+        <div id="ps-saved-searches"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Prospect Pool -->
+    <div id="page-prospect-pool" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Prospect Pool</div>
+        <button class="btn-sm btn-primary" onclick="showAddProspectModal()">+ Add Manually</button>
+      </div>
+      <div class="filter-row" id="pool-filter-row">
+        <button class="filter-btn active" data-status="all" onclick="setPoolFilter('all')">All <span id="pool-cnt-all" class="badge b-default" style="margin-left:4px"></span></button>
+        <button class="filter-btn" data-status="pending" onclick="setPoolFilter('pending')">Pending <span id="pool-cnt-pending" class="badge b-pending_review" style="margin-left:4px"></span></button>
+        <button class="filter-btn" data-status="accepted" onclick="setPoolFilter('accepted')">Accepted <span id="pool-cnt-accepted" class="badge b-approved" style="margin-left:4px"></span></button>
+        <button class="filter-btn" data-status="rejected" onclick="setPoolFilter('rejected')">Rejected <span id="pool-cnt-rejected" class="badge b-rejected" style="margin-left:4px"></span></button>
+        <button class="filter-btn" data-status="assigned" onclick="setPoolFilter('assigned')">Assigned <span id="pool-cnt-assigned" class="badge b-sent" style="margin-left:4px"></span></button>
+      </div>
+      <div id="pool-bulk-bar" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="pool-sel-count" style="font-size:13px;font-weight:600;color:#1d4ed8"></span>
+        <button class="btn-sm btn-success" onclick="bulkAcceptSelected()">Accept Selected</button>
+        <button class="btn-sm btn-danger-outline" onclick="bulkRejectSelected()">Reject Selected</button>
+        <button class="btn-sm btn-primary" onclick="showAssignModal()">Assign to Campaign</button>
+        <button class="btn-sm btn-outline" onclick="clearPoolSelection()">Clear Selection</button>
+      </div>
+      <div class="search-wrap">
+        <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input type="search" id="poolSearch" placeholder="Search prospects..." oninput="doPoolSearch()">
+      </div>
+      <div id="prospect-pool-list"></div>
+      <div class="pager" id="pool-pager" style="display:none">
+        <button class="btn-sm btn-outline" id="pool-prev" onclick="changePoolPage(-1)">← Prev</button>
+        <span class="pager-info" id="pool-pager-info"></span>
+        <button class="btn-sm btn-outline" id="pool-next" onclick="changePoolPage(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Content Review -->
+    <div id="page-content-review" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Content Review</div>
+        <button class="btn-sm btn-outline" onclick="loadContentReview()">Refresh</button>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:200px;margin:0">
+            <select id="cr-campaign-select" onchange="loadContentReview()" style="font-size:14px">
+              <option value="">— Select a Campaign —</option>
+            </select>
+          </div>
+          <button class="btn-sm btn-primary" onclick="triggerDraftGeneration()">Generate Drafts</button>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input id="cr-threshold" type="number" value="5" min="0" max="10" style="width:56px;padding:8px;font-size:13px">
+            <button class="btn-sm btn-success" onclick="bulkApproveSafe()">Approve All Safe</button>
+          </div>
+        </div>
+      </div>
+      <div id="cr-stats-bar" style="display:none" class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-box"><div class="stat-val" id="cr-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-box" style="background:#fef9c3"><div class="stat-val" id="cr-pending" style="color:#854d0e">0</div><div class="stat-lbl">Pending Review</div></div>
+        <div class="stat-box" style="background:#f0fdf4"><div class="stat-val" id="cr-approved" style="color:#16a34a">0</div><div class="stat-lbl">Approved</div></div>
+        <div class="stat-box" style="background:#fef2f2"><div class="stat-val" id="cr-rejected" style="color:#dc2626">0</div><div class="stat-lbl">Rejected</div></div>
+      </div>
+      <div id="cr-ready-banner" style="display:none" class="alert alert-success">
+        All drafts reviewed and approved! <button class="btn-sm btn-success" style="margin-left:10px" onclick="runCurrentCampaign()">Run Campaign Now</button>
+      </div>
+      <div id="cr-drafts-list"><div class="empty">Select a campaign to review drafts.</div></div>
+    </div>
+
   </main>
 
   <!-- Bottom nav mobile -->
@@ -447,6 +559,9 @@ function nav(page){
   else if(page==='suppression') loadSuppression();
   else if(page==='audit') loadAudit();
   else if(page==='jobs') loadJobs();
+  else if(page==='prospect-search') loadSavedSearches();
+  else if(page==='prospect-pool') loadProspectPool();
+  else if(page==='content-review') loadContentReview();
 }
 
 // DASHBOARD
@@ -1772,6 +1887,443 @@ function showToast(msg){
   if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;white-space:nowrap';document.body.appendChild(t);}
   t.textContent=msg;t.style.display='block';
   clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>{t.style.display='none';},2500);
+}
+
+// ── PROSPECT SEARCH ───────────────────────────────────────────────────────
+let _psResults = [];
+let _psSearchId = null;
+
+async function runProspectSearch() {
+  const industries = document.getElementById('ps-industries').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const locations = document.getElementById('ps-locations').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const titles = document.getElementById('ps-titles').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const keywords = document.getElementById('ps-keywords').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const source = document.querySelector('input[name="ps-source"]:checked')?.value || 'apollo';
+  document.getElementById('ps-alert').innerHTML = '';
+  document.getElementById('ps-btn').disabled = true;
+  document.getElementById('ps-btn').textContent = 'Searching…';
+  document.getElementById('ps-results-wrap').style.display = 'none';
+  try {
+    const d = await apiFetch('/prospects/search', { method: 'POST', body: JSON.stringify({ industries, locations, titles, keywords, source }) });
+    _psResults = d.results || [];
+    _psSearchId = d.searchId;
+    document.getElementById('ps-result-count').textContent = `${_psResults.length} results`;
+    document.getElementById('ps-results-wrap').style.display = 'block';
+    renderSearchResults(_psResults);
+    loadSavedSearches();
+  } catch(e) {
+    document.getElementById('ps-alert').innerHTML = `<div class="alert alert-error">${esc(e.message)}</div>`;
+  } finally {
+    document.getElementById('ps-btn').disabled = false;
+    document.getElementById('ps-btn').textContent = 'Search Prospects';
+  }
+}
+
+function renderSearchResults(results) {
+  if (!results.length) { document.getElementById('ps-results-table').innerHTML = '<div class="empty">No results found.</div>'; return; }
+  document.getElementById('ps-results-table').innerHTML = '<div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8fafc"><th style="padding:8px 12px;text-align:left;font-weight:600;color:#64748b">Name</th><th style="padding:8px 12px;text-align:left;font-weight:600;color:#64748b">Title</th><th style="padding:8px 12px;text-align:left;font-weight:600;color:#64748b">Company</th><th style="padding:8px 12px;text-align:left;font-weight:600;color:#64748b">Email</th><th style="padding:8px 12px;text-align:left;font-weight:600;color:#64748b">Actions</th></tr></thead><tbody>' +
+    results.map((r,i) => `<tr style="border-top:1px solid #f1f5f9"><td style="padding:8px 12px">${esc((r.first_name||'')+' '+(r.last_name||''))}</td><td style="padding:8px 12px">${esc(r.title||'—')}</td><td style="padding:8px 12px">${esc(r.company_name||'—')}</td><td style="padding:8px 12px">${esc(r.email||'—')}</td><td style="padding:8px 12px"><button class="btn-sm btn-outline" onclick="addOneToPool(${i})">Add to Pool</button></td></tr>`).join('') +
+    '</tbody></table></div></div>';
+}
+
+async function addOneToPool(idx) {
+  const p = _psResults[idx];
+  try {
+    await apiFetch('/prospects', { method: 'POST', body: JSON.stringify({ ...p, search_id: _psSearchId }) });
+    showToast('Added to pool');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function addAllToPool() {
+  if (!_psResults.length) return;
+  try {
+    const d = await apiFetch('/prospects/search/' + _psSearchId + '/save', { method: 'POST', body: JSON.stringify({ results: _psResults }) });
+    showToast(`${d.saved} prospects added to pool`);
+    nav('prospect-pool');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function loadSavedSearches() {
+  try {
+    const d = await apiFetch('/prospects/searches?limit=10');
+    const rows = d.data || [];
+    if (!rows.length) { document.getElementById('ps-saved-searches').innerHTML = '<div class="empty">No saved searches yet.</div>'; return; }
+    document.getElementById('ps-saved-searches').innerHTML = '<div>' + rows.map(s => {
+      let q = s.query || {};
+      const desc = [q.source||'apollo', (q.industries||[]).join(', ')].filter(Boolean).join(' · ');
+      return `<div class="row-item"><div><div class="row-name">${esc(desc||'Search')}</div><div class="row-sub">${s.result_count} results · ${fmt(s.created_at)}</div></div><span class="badge ${badgeClass(s.status)}">${esc(s.status)}</span></div>`;
+    }).join('') + '</div>';
+  } catch(e) { document.getElementById('ps-saved-searches').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+// ── PROSPECT POOL ─────────────────────────────────────────────────────────
+let _poolFilter = 'all';
+let _poolPage = 1;
+let _poolSearch = '';
+let _poolSelected = new Set();
+let _psTimer2;
+
+function setPoolFilter(s) {
+  _poolFilter = s;
+  _poolPage = 1;
+  _poolSelected.clear();
+  document.querySelectorAll('#pool-filter-row .filter-btn').forEach(b => b.classList.toggle('active', b.dataset.status === s));
+  loadProspectPool();
+}
+
+function doPoolSearch() {
+  _poolSearch = document.getElementById('poolSearch').value;
+  clearTimeout(_psTimer2);
+  _psTimer2 = setTimeout(() => { _poolPage = 1; loadProspectPool(); }, 350);
+}
+
+function changePoolPage(d) { _poolPage += d; loadProspectPool(); }
+
+async function loadProspectPool() {
+  document.getElementById('prospect-pool-list').innerHTML = '<div class="spinner"></div>';
+  try {
+    const params = new URLSearchParams({ page: _poolPage, limit: 25 });
+    if (_poolFilter !== 'all') params.set('status', _poolFilter);
+    if (_poolSearch) params.set('search', _poolSearch);
+    const data = await apiFetch('/prospects?' + params);
+    const rows = data.data || [];
+    _poolSelected.clear();
+    updateBulkBar();
+
+    // Update badge counts
+    const allCounts = await apiFetch('/prospects?limit=1');
+    ['all','pending','accepted','rejected','assigned'].forEach(async s => {
+      try {
+        const p = new URLSearchParams({ limit: 1 });
+        if (s !== 'all') p.set('status', s);
+        const c = await apiFetch('/prospects?' + p);
+        const el = document.getElementById('pool-cnt-' + s);
+        if (el) el.textContent = c.total || 0;
+      } catch(_) { /* ignore */ }
+    });
+
+    if (!rows.length) { document.getElementById('prospect-pool-list').innerHTML = '<div class="empty">No prospects found.</div>'; return; }
+
+    document.getElementById('prospect-pool-list').innerHTML = '<div class="card"><div>' + rows.map(r => `
+      <div class="row-item" id="pool-row-${esc(r.id)}">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <input type="checkbox" style="width:auto;padding:0;border:none;flex-shrink:0" onchange="togglePoolSelect('${esc(r.id)}',this.checked)" ${_poolSelected.has(r.id)?'checked':''}>
+          <div style="min-width:0">
+            <div class="row-name">${esc((r.first_name||'') + ' ' + (r.last_name||''))}</div>
+            <div class="row-sub">${esc(r.title||'')}${r.title&&r.company_name?' @ ':''}${esc(r.company_name||'')} · ${esc(r.email||'—')}</div>
+            <div class="row-sub">${esc(r.source||'')} · ${fmt(r.created_at)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span>
+          ${r.status!=='assigned'?`<button class="btn-sm btn-success" title="Accept" onclick="acceptProspect('${esc(r.id)}')">✓</button>`:''}
+          ${r.status!=='assigned'?`<button class="btn-sm btn-danger-outline" title="Reject" onclick="rejectProspect('${esc(r.id)}')">✗</button>`:''}
+          <button class="btn-sm btn-outline" onclick="showEditProspectModal('${esc(r.id)}')">Edit</button>
+          ${(r.status==='pending'||r.status==='rejected')?`<button class="btn-sm btn-danger-outline" onclick="deleteProspect('${esc(r.id)}')">Del</button>`:''}
+        </div>
+      </div>`).join('') + '</div></div>';
+
+    const pages = Math.ceil((data.total || 0) / 25);
+    if (pages > 1) {
+      document.getElementById('pool-pager').style.display = 'flex';
+      document.getElementById('pool-pager-info').textContent = `Page ${_poolPage} of ${pages} (${data.total})`;
+      document.getElementById('pool-prev').disabled = _poolPage <= 1;
+      document.getElementById('pool-next').disabled = _poolPage >= pages;
+    } else { document.getElementById('pool-pager').style.display = 'none'; }
+  } catch(e) { document.getElementById('prospect-pool-list').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+function togglePoolSelect(id, checked) {
+  if (checked) _poolSelected.add(id); else _poolSelected.delete(id);
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('pool-bulk-bar');
+  if (_poolSelected.size > 0) {
+    bar.style.display = 'flex';
+    document.getElementById('pool-sel-count').textContent = `${_poolSelected.size} selected`;
+  } else { bar.style.display = 'none'; }
+}
+
+function clearPoolSelection() { _poolSelected.clear(); loadProspectPool(); }
+
+async function acceptProspect(id) {
+  try { await apiFetch('/prospects/' + id + '/accept', { method: 'POST', body: '{}' }); showToast('Accepted'); loadProspectPool(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function rejectProspect(id) {
+  try { await apiFetch('/prospects/' + id + '/reject', { method: 'POST', body: '{}' }); showToast('Rejected'); loadProspectPool(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteProspect(id) {
+  if (!confirm('Delete this prospect?')) return;
+  try { await apiFetch('/prospects/' + id, { method: 'DELETE' }); showToast('Deleted'); loadProspectPool(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function bulkAcceptSelected() {
+  const ids = [..._poolSelected];
+  if (!ids.length) return;
+  try { await apiFetch('/prospects/bulk/accept', { method: 'POST', body: JSON.stringify({ ids }) }); showToast(`${ids.length} accepted`); loadProspectPool(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function bulkRejectSelected() {
+  const ids = [..._poolSelected];
+  if (!ids.length) return;
+  try { await apiFetch('/prospects/bulk/reject', { method: 'POST', body: JSON.stringify({ ids }) }); showToast(`${ids.length} rejected`); loadProspectPool(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function showAssignModal() {
+  const ids = [..._poolSelected];
+  if (!ids.length) return;
+  try {
+    const camps = await apiFetch('/campaigns?limit=50');
+    document.getElementById('modal-body').innerHTML = `
+      <div class="modal-title">Assign to Campaign</div>
+      <div class="form-stack">
+        <div id="assign-alert"></div>
+        <div class="field"><label>Campaign (${ids.length} prospects)</label>
+          <select id="assign-camp-id">
+            <option value="">— Select Campaign —</option>
+            ${(camps.data||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.name)} (${esc(c.status)})</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAssign(${JSON.stringify(ids)})">Assign</button>
+      </div>`;
+    document.getElementById('overlay').style.display = 'flex';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function confirmAssign(ids) {
+  const campaignId = document.getElementById('assign-camp-id').value;
+  if (!campaignId) { document.getElementById('assign-alert').innerHTML = '<div class="alert alert-error">Select a campaign</div>'; return; }
+  try {
+    const d = await apiFetch('/prospects/bulk/assign', { method: 'POST', body: JSON.stringify({ ids, campaignId }) });
+    closeModal(); showToast(`${d.assigned} prospect(s) assigned`); loadProspectPool();
+  } catch(e) { document.getElementById('assign-alert').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+function showAddProspectModal() {
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-title">Add Prospect Manually</div>
+    <div class="form-stack">
+      <div id="addp-alert"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>First Name</label><input id="addp-fn" placeholder="Jane"></div>
+        <div class="field"><label>Last Name</label><input id="addp-ln" placeholder="Doe"></div>
+      </div>
+      <div class="field"><label>Email</label><input id="addp-email" type="email" placeholder="jane@company.com"></div>
+      <div class="field"><label>Title</label><input id="addp-title" placeholder="Practice Manager"></div>
+      <div class="field"><label>Company</label><input id="addp-company" placeholder="Acme Corp"></div>
+      <div class="field"><label>Notes</label><textarea id="addp-notes" style="height:60px"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAddProspect()">Add to Pool</button>
+    </div>`;
+  document.getElementById('overlay').style.display = 'flex';
+}
+
+async function saveAddProspect() {
+  const data = {
+    first_name: document.getElementById('addp-fn').value.trim(),
+    last_name: document.getElementById('addp-ln').value.trim(),
+    email: document.getElementById('addp-email').value.trim(),
+    title: document.getElementById('addp-title').value.trim(),
+    company_name: document.getElementById('addp-company').value.trim(),
+    notes: document.getElementById('addp-notes').value.trim(),
+    source: 'manual',
+  };
+  try {
+    await apiFetch('/prospects', { method: 'POST', body: JSON.stringify(data) });
+    closeModal(); showToast('Prospect added to pool'); loadProspectPool();
+  } catch(e) { document.getElementById('addp-alert').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+async function showEditProspectModal(id) {
+  try {
+    const p = await apiFetch('/prospects/' + id);
+    document.getElementById('modal-body').innerHTML = `
+      <div class="modal-title">Edit Prospect</div>
+      <div class="form-stack">
+        <div id="editp-alert"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>First Name</label><input id="editp-fn" value="${esc(p.first_name||'')}"></div>
+          <div class="field"><label>Last Name</label><input id="editp-ln" value="${esc(p.last_name||'')}"></div>
+        </div>
+        <div class="field"><label>Email</label><input id="editp-email" value="${esc(p.email||'')}"></div>
+        <div class="field"><label>Title</label><input id="editp-title" value="${esc(p.title||'')}"></div>
+        <div class="field"><label>Company</label><input id="editp-company" value="${esc(p.company_name||'')}"></div>
+        <div class="field"><label>Notes</label><textarea id="editp-notes" style="height:60px">${esc(p.notes||'')}</textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditProspect('${esc(id)}')">Save</button>
+      </div>`;
+    document.getElementById('overlay').style.display = 'flex';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function saveEditProspect(id) {
+  const data = {
+    first_name: document.getElementById('editp-fn').value.trim(),
+    last_name: document.getElementById('editp-ln').value.trim(),
+    email: document.getElementById('editp-email').value.trim(),
+    title: document.getElementById('editp-title').value.trim(),
+    company_name: document.getElementById('editp-company').value.trim(),
+    notes: document.getElementById('editp-notes').value.trim(),
+  };
+  try {
+    await apiFetch('/prospects/' + id, { method: 'PATCH', body: JSON.stringify(data) });
+    closeModal(); showToast('Prospect updated'); loadProspectPool();
+  } catch(e) { document.getElementById('editp-alert').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+// ── CONTENT REVIEW ────────────────────────────────────────────────────────
+let _crCampaignId = null;
+
+async function loadContentReview() {
+  // Populate campaign dropdown
+  try {
+    const camps = await apiFetch('/campaigns?limit=50');
+    const sel = document.getElementById('cr-campaign-select');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select a Campaign —</option>' +
+      (camps.data||[]).map(c => `<option value="${esc(c.id)}" ${c.id===cur?'selected':''}>${esc(c.name)} (${esc(c.status)})</option>`).join('');
+    if (cur) sel.value = cur;
+  } catch(_) { /* ignore */ }
+
+  _crCampaignId = document.getElementById('cr-campaign-select').value;
+  if (!_crCampaignId) { document.getElementById('cr-drafts-list').innerHTML = '<div class="empty">Select a campaign to review drafts.</div>'; document.getElementById('cr-stats-bar').style.display = 'none'; document.getElementById('cr-ready-banner').style.display = 'none'; return; }
+
+  await Promise.all([loadCrStats(), loadCrDrafts()]);
+}
+
+async function loadCrStats() {
+  if (!_crCampaignId) return;
+  try {
+    const s = await apiFetch('/drafts/campaign/' + _crCampaignId + '/stats');
+    document.getElementById('cr-total').textContent = s.total || 0;
+    document.getElementById('cr-pending').textContent = s.pending_review || 0;
+    document.getElementById('cr-approved').textContent = s.approved || 0;
+    document.getElementById('cr-rejected').textContent = s.rejected || 0;
+    document.getElementById('cr-stats-bar').style.display = 'grid';
+
+    const ready = s.total > 0 && s.pending_review === 0 && s.approved > 0;
+    document.getElementById('cr-ready-banner').style.display = ready ? 'block' : 'none';
+  } catch(_) { /* ignore */ }
+}
+
+async function loadCrDrafts() {
+  if (!_crCampaignId) return;
+  document.getElementById('cr-drafts-list').innerHTML = '<div class="spinner"></div>';
+  try {
+    const d = await apiFetch('/drafts/campaign/' + _crCampaignId + '?limit=50');
+    const rows = d.data || [];
+    if (!rows.length) { document.getElementById('cr-drafts-list').innerHTML = '<div class="empty">No drafts yet. Click "Generate Drafts" to create them.</div>'; return; }
+
+    function spamBadge(score) {
+      if (score <= 2) return '<span class="badge b-approved">Spam ' + score + '</span>';
+      if (score <= 5) return '<span class="badge b-pending_review">Spam ' + score + '</span>';
+      return '<span class="badge b-rejected">Spam ' + score + '</span>';
+    }
+
+    document.getElementById('cr-drafts-list').innerHTML = rows.map(r => `
+      <div class="card" id="cr-draft-${esc(r.id)}">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">${esc(r.subject||'(no subject)')}</div>
+            <div style="font-size:12px;color:#94a3b8">${esc(r.first_name||'')} ${esc(r.last_name||'')} &lt;${esc(r.contact_email||'')}&gt; · ${esc(r.contact_title||'')} · ${fmt(r.created_at)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${spamBadge(r.spam_score||0)}
+            <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="draft-body" id="body-${esc(r.id)}">${esc((r.body||'').substring(0,300))}${r.body&&r.body.length>300?'…':''}</div>
+          <div id="editor-${esc(r.id)}" style="display:none" class="form-stack" style="margin-top:8px">
+            <div class="field"><label>Subject</label><input id="edit-subj-${esc(r.id)}" value="${esc(r.subject||'')}"></div>
+            <div class="field"><label>Body</label><textarea id="edit-body-${esc(r.id)}" style="height:120px">${esc(r.body||'')}</textarea></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm btn-primary" onclick="saveDraftEdit('${esc(r.id)}')">Save</button>
+              <button class="btn-sm btn-outline" onclick="toggleDraftEditor('${esc(r.id)}',false)">Cancel</button>
+            </div>
+          </div>
+          <div class="modal-actions" style="margin-top:10px">
+            ${r.status!=='approved'?`<button class="btn btn-success" onclick="crApproveDraft('${esc(r.id)}')">Approve ✓</button>`:''}
+            ${r.status!=='rejected'?`<button class="btn btn-danger-outline" onclick="crRejectDraft('${esc(r.id)}')">Reject ✗</button>`:''}
+            <button class="btn btn-secondary" onclick="toggleDraftEditor('${esc(r.id)}',true)">Edit</button>
+            <button class="btn btn-secondary" onclick="crRegenerateDraft('${esc(r.id)}')">↻ Regen</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) { document.getElementById('cr-drafts-list').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+function toggleDraftEditor(id, show) {
+  document.getElementById('editor-' + id).style.display = show ? 'block' : 'none';
+  document.getElementById('body-' + id).style.display = show ? 'none' : 'block';
+}
+
+async function crApproveDraft(id) {
+  try { await apiFetch('/drafts/' + id + '/approve', { method: 'POST', body: '{}' }); showToast('Approved'); loadContentReview(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function crRejectDraft(id) {
+  const reason = prompt('Rejection reason (optional):') || '';
+  try { await apiFetch('/drafts/' + id + '/reject', { method: 'POST', body: JSON.stringify({ reason }) }); showToast('Rejected'); loadContentReview(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function saveDraftEdit(id) {
+  const subject = document.getElementById('edit-subj-' + id).value;
+  const body = document.getElementById('edit-body-' + id).value;
+  try { await apiFetch('/drafts/' + id, { method: 'PATCH', body: JSON.stringify({ subject, body }) }); showToast('Draft saved'); loadContentReview(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function crRegenerateDraft(id) {
+  try { await apiFetch('/drafts/' + id + '/regenerate', { method: 'POST', body: '{}' }); showToast('Regeneration queued'); loadContentReview(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+async function triggerDraftGeneration() {
+  if (!_crCampaignId) { alert('Select a campaign first'); return; }
+  try {
+    const d = await apiFetch('/drafts/campaign/' + _crCampaignId + '/generate', { method: 'POST', body: '{}' });
+    showToast(`${d.enqueued} draft generation job(s) enqueued`);
+    setTimeout(loadContentReview, 1500);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function bulkApproveSafe() {
+  if (!_crCampaignId) { alert('Select a campaign first'); return; }
+  const spamThreshold = parseFloat(document.getElementById('cr-threshold').value) || 5;
+  try {
+    const d = await apiFetch('/drafts/campaign/' + _crCampaignId + '/approve-all', { method: 'POST', body: JSON.stringify({ spamThreshold }) });
+    showToast(`${d.approved} draft(s) approved`);
+    loadContentReview();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function runCurrentCampaign() {
+  if (!_crCampaignId) return;
+  if (!confirm('Run this campaign now? This will send emails to all approved recipients.')) return;
+  try {
+    const run = await apiFetch('/campaigns/' + _crCampaignId + '/run', { method: 'POST', body: '{}' });
+    showToast('Campaign run started (run ID: ' + run.id.slice(0, 8) + ')');
+    nav('campaigns');
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 // Init: try to restore session

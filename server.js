@@ -60,6 +60,8 @@ const adminRouter = require('./src/api/admin');
 const senderProfilesRouter = require('./src/api/sender-profiles');
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/prospects', require('./src/api/prospects'));
+app.use('/api/v1/drafts', require('./src/api/drafts'));
 app.use('/api/v1/campaigns', campaignsRouter);
 app.use('/api/v1/accounts', accountsRouter);
 app.use('/api/v1/contacts', contactsRouter);

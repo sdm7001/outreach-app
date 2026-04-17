@@ -27,6 +27,7 @@ const {
   createRun, updateRun, logRunStep, getCampaignRaw,
   getSequenceForCampaign, isExcluded, updateCampaign,
 } = require('./campaign.service');
+const { ValidationError } = require('../utils/errors');
 const logger = require('../utils/logger');
 
 // ── PUBLIC ENTRY POINTS ───────────────────────────────────────────────────
@@ -34,13 +35,26 @@ const logger = require('../utils/logger');
 /**
  * Run all stages for a campaign (the main "run now" action).
  */
-async function runCampaign(campaignId, { triggeredBy, triggeredByEmail, runType = 'manual', dryRun = false, notes } = {}) {
+async function runCampaign(campaignId, { triggeredBy, triggeredByEmail, runType = 'manual', dryRun = false, notes, force = false } = {}) {
   const campaign = getCampaignRaw(campaignId);
 
   // Block if campaign is not in a runnable state
   const runnableStatuses = ['active', 'running', 'ready', 'scheduled', 'draft'];
   if (!runnableStatuses.includes(campaign.status)) {
     throw new Error(`Campaign cannot be run in status '${campaign.status}'`);
+  }
+
+  // Guard: all drafts must be reviewed before running (bypassable with force:true for dry runs)
+  if (!force && !dryRun) {
+    const db = getDb();
+    const pendingDrafts = db.prepare(
+      "SELECT COUNT(*) as cnt FROM message_drafts WHERE campaign_id = ? AND status = 'pending_review'"
+    ).get(campaignId).cnt;
+    if (pendingDrafts > 0) {
+      throw new ValidationError(
+        'All drafts must be reviewed before running. Use the Content Review workflow to approve or reject pending drafts.'
+      );
+    }
   }
 
   const idempotencyKey = dryRun ? null : `run:all:${campaignId}:${new Date().toISOString().slice(0, 16)}`;
