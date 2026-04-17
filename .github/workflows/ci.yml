@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['18', '20']
+    env:
+      JWT_SECRET: ci-test-secret-key-minimum-32-chars
+      ADMIN_PASSWORD: CITestAdmin1!
+      NODE_ENV: test
+      DB_PATH: ':memory:'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+      - name: Upload coverage
+        if: matrix.node == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+
+  startup:
+    name: Startup Smoke Test
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ci-smoke-test-secret-key-32chars
+      ADMIN_PASSWORD: SmokeTestAdmin1!
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --omit=dev
+      - name: Run migrations
+        run: node scripts/migrate.js
+      - name: Start server and health check
+        run: |
+          node server.js &
+          SERVER_PID=$!
+          sleep 4
+          node scripts/health-check.js
+          kill $SERVER_PID

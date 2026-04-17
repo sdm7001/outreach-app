@@ -2,17 +2,12 @@
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#2563eb">
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<title>Outreach</title>
+<title>Outreach Enterprise</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;height:100dvh;overflow:hidden}
-
-/* Gate */
 #gate{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;z-index:100}
 #gate.hidden{display:none}
 .gate-icon{width:60px;height:60px;background:#2563eb;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
@@ -21,38 +16,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gate-sub{font-size:14px;color:#94a3b8;margin-top:4px;margin-bottom:32px}
 .gate-form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px}
 .field label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:5px}
-
-/* Inputs */
-input,select,textarea{
-  width:100%;padding:13px 14px;border:1.5px solid #e2e8f0;border-radius:10px;
-  font-size:16px;color:#0f172a;background:#fff;outline:none;
-  -webkit-appearance:none;appearance:none;font-family:inherit;transition:border-color .15s
-}
+input,select,textarea{width:100%;padding:13px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:16px;color:#0f172a;background:#fff;outline:none;-webkit-appearance:none;appearance:none;font-family:inherit;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
 input::placeholder{color:#cbd5e1}
 textarea{resize:none;height:80px}
-
-/* Buttons */
 .btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
 .btn-primary{background:#2563eb;color:#fff}
 .btn-primary:active{background:#1d4ed8}
 .btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
 .btn-secondary{background:#f1f5f9;color:#374151;font-size:14px;padding:10px 16px;width:auto}
-.btn-secondary:active{background:#e2e8f0}
 .btn-sm{padding:7px 14px;font-size:13px;border-radius:8px;font-weight:500;border:none;cursor:pointer;font-family:inherit}
 .btn-outline{background:#fff;border:1.5px solid #e2e8f0;color:#374151}
-.btn-outline:active{background:#f8fafc}
+.btn-success{background:#16a34a;color:#fff}
+.btn-danger{background:#dc2626;color:#fff}
 .btn-danger-outline{background:#fff;border:1.5px solid #fecaca;color:#dc2626}
-
-/* App shell */
 #app{display:none;height:100dvh}
 #app.visible{display:flex;flex-direction:row;overflow:hidden}
-
-/* Sidebar desktop */
-#sidebar{
-  width:220px;min-width:220px;background:#fff;border-right:1px solid #e2e8f0;
-  display:none;flex-direction:column;padding:18px 10px 18px;
-}
+#sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e2e8f0;display:none;flex-direction:column;padding:18px 10px 18px}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:16px}
 .sb-logo-dot{width:32px;height:32px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-logo-dot svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -63,332 +43,281 @@ textarea{resize:none;height:80px}
 .ni.active{background:#eff6ff;color:#2563eb}
 .ni svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sb-footer{border-top:1px solid #f1f5f9;padding-top:10px;margin-top:10px}
-
-/* Main content */
 #content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(76px + env(safe-area-inset-bottom));background:#f1f5f9}
-
-/* Bottom nav mobile */
-#bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;
-  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50
-}
-.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;
-  cursor:pointer;border:none;background:none;color:#94a3b8;font-size:10px;font-weight:500;font-family:inherit;transition:color .15s}
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;cursor:pointer;border:none;background:none;color:#94a3b8;font-size:10px;font-weight:500;font-family:inherit;transition:color .15s}
 .bn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .bn.active{color:#2563eb}
-
-/* Desktop breakpoint */
-@media(min-width:768px){
-  #sidebar{display:flex}
-  #bottom-nav{display:none}
-  #content{padding:28px 32px}
-}
-
-/* Pages */
-.page{display:none}
-.page.active{display:block}
+@media(min-width:768px){#sidebar{display:flex}#bottom-nav{display:none}#content{padding:28px 32px}}
+.page{display:none}.page.active{display:block}
 .page-title{font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-.3px;margin-bottom:16px}
-
-/* KPI grid */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 @media(min-width:768px){.kpi-grid{grid-template-columns:repeat(4,1fr)}}
 .kpi{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px}
 .kpi-label{font-size:12px;color:#64748b;font-weight:500;margin-bottom:6px}
 .kpi-value{font-size:26px;font-weight:700;color:#0f172a;line-height:1}
 .kpi-sub{font-size:11px;color:#94a3b8;margin-top:4px}
-
-/* Cards */
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:14px}
 .card-head{padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
 .card-head-title{font-size:15px;font-weight:600;color:#0f172a}
 .card-body{padding:16px}
-
-/* Prospect cards */
-.pc{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px}
-.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.pc-name{font-size:15px;font-weight:600;color:#0f172a}
-.pc-meta{font-size:12px;color:#94a3b8;margin-top:2px}
+.row-item{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f8fafc}
+.row-item:last-child{border-bottom:none}
+.row-name{font-size:14px;font-weight:500;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.row-sub{font-size:12px;color:#94a3b8}
+.row-actions{display:flex;gap:6px;flex-shrink:0}
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .b-pending{background:#f8fafc;color:#64748b}
+.b-active{background:#f0fdf4;color:#16a34a}
+.b-draft{background:#fef9c3;color:#854d0e}
 .b-sent{background:#eff6ff;color:#2563eb}
 .b-opened{background:#f0fdf4;color:#16a34a}
 .b-clicked{background:#f0fdf4;color:#16a34a}
 .b-replied{background:#fef9c3;color:#854d0e}
-.b-bounced{background:#fef2f2;color:#dc2626}
-.b-unsubscribed{background:#f8fafc;color:#94a3b8}
+.b-bounced,.b-dead{background:#fef2f2;color:#dc2626}
+.b-unsubscribed,.b-suppressed{background:#f8fafc;color:#94a3b8}
+.b-approved{background:#f0fdf4;color:#16a34a}
+.b-rejected{background:#fef2f2;color:#dc2626}
+.b-pending_review{background:#fef9c3;color:#854d0e}
+.b-completed{background:#f0fdf4;color:#16a34a}
+.b-processing{background:#eff6ff;color:#2563eb}
 .b-default{background:#f1f5f9;color:#64748b}
-.pc-score{font-size:12px;color:#64748b}
-.pc-email{font-size:13px;color:#64748b;word-break:break-all}
-.pc-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-
-/* Recent list */
-.rl-item{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f8fafc}
-.rl-item:last-child{border-bottom:none}
-.rl-name{font-size:14px;font-weight:500;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.rl-co{font-size:12px;color:#94a3b8}
-
-/* Search */
 .search-wrap{margin-bottom:14px;position:relative}
 .search-wrap input{padding-left:36px}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#94a3b8}
 .search-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* Filter row */
-.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
 .filter-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:#64748b;font-family:inherit;transition:all .15s}
 .filter-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
-
-/* Config form */
-.cfg-section{margin-bottom:20px}
-.cfg-title{font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.cfg-grid{display:grid;grid-template-columns:1fr;gap:10px}
-@media(min-width:640px){.cfg-grid{grid-template-columns:1fr 1fr}}
-.cfg-field label{font-size:13px;font-weight:500;color:#374151;display:block;margin-bottom:4px}
-.test-row{display:flex;gap:8px;align-items:center;margin-top:6px}
-.test-result{font-size:12px;margin-top:4px}
-.test-ok{color:#16a34a}
-.test-fail{color:#dc2626}
-
-/* Alert */
 .alert{padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:12px}
 .alert-error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
 .alert-success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
 .alert-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-
-/* Loading */
 .spinner{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;margin:40px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty{text-align:center;padding:48px 24px;color:#94a3b8;font-size:14px}
-
-/* Pager */
 .pager{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;gap:8px}
 .pager-info{font-size:13px;color:#94a3b8}
-
-/* Modal */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
 @media(min-width:640px){.overlay{align-items:center}}
-.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:22px 20px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:22px 20px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto}
 @media(min-width:640px){.modal{border-radius:16px;padding:24px;max-height:85vh}}
 .modal-title{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:18px}
 .form-stack{display:flex;flex-direction:column;gap:12px}
-.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.modal-actions{display:flex;gap:10px;margin-top:4px}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
 .modal-actions .btn{flex:1}
-
-/* Divider */
+.draft-body{font-size:13px;color:#374151;line-height:1.6;background:#f8fafc;padding:12px;border-radius:8px;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:#f8fafc;border-radius:10px;padding:12px;text-align:center}
+.stat-val{font-size:22px;font-weight:700;color:#0f172a}
+.stat-lbl{font-size:11px;color:#94a3b8;margin-top:2px}
 hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
 </style>
 </head>
 <body>
 
-<!-- GATE -->
 <div id="gate">
-  <div class="gate-icon">
-    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  </div>
-  <div class="gate-title">Outreach</div>
-  <div class="gate-sub">TexMG Sales Intelligence</div>
+  <div class="gate-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+  <div class="gate-title">Outreach Enterprise</div>
+  <div class="gate-sub">TexMG Sales Intelligence Platform</div>
   <form class="gate-form" id="loginForm">
     <div id="loginAlert"></div>
-    <div class="field">
-      <label>Admin Password</label>
-      <input type="password" id="loginPw" placeholder="Enter password" required autocomplete="current-password">
-    </div>
+    <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="admin@example.com" value="admin@example.com" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="loginPw" placeholder="Password" required autocomplete="current-password"></div>
     <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
   </form>
 </div>
 
-<!-- APP -->
 <div id="app">
-
-  <!-- Sidebar (desktop) -->
   <nav id="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-dot">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      </div>
+      <div class="sb-logo-dot"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
       <span class="sb-logo-text">Outreach</span>
     </div>
     <div class="sb-nav">
-      <button class="ni active" data-p="dashboard" onclick="nav('dashboard')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        Dashboard
-      </button>
-      <button class="ni" data-p="prospects" onclick="nav('prospects')">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Prospects
-      </button>
-      <button class="ni" data-p="admin" onclick="nav('admin')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Settings
-      </button>
+      <button class="ni active" data-p="dashboard" onclick="nav('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+      <button class="ni" data-p="campaigns" onclick="nav('campaigns')"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Campaigns</button>
+      <button class="ni" data-p="contacts" onclick="nav('contacts')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts</button>
+      <button class="ni" data-p="review" onclick="nav('review')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Review Queue</button>
+      <button class="ni" data-p="suppression" onclick="nav('suppression')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Suppression</button>
+      <button class="ni" data-p="audit" onclick="nav('audit')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Audit Log</button>
+      <button class="ni" data-p="jobs" onclick="nav('jobs')"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Jobs</button>
     </div>
     <div class="sb-footer">
-      <button class="ni" onclick="logout()">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sign Out
-      </button>
+      <div style="font-size:11px;color:#94a3b8;padding:6px 10px;margin-bottom:4px" id="userLabel"></div>
+      <button class="ni" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
     </div>
   </nav>
 
-  <!-- Content -->
   <main id="content">
 
     <!-- Dashboard -->
     <div id="page-dashboard" class="page active">
       <div class="page-title">Dashboard</div>
       <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-label">Total Prospects</div><div class="kpi-value" id="k-total">—</div></div>
-        <div class="kpi"><div class="kpi-label">Emails Sent</div><div class="kpi-value" id="k-sent">—</div></div>
-        <div class="kpi"><div class="kpi-label">Open Rate</div><div class="kpi-value" id="k-open">—</div><div class="kpi-sub">30-day avg</div></div>
-        <div class="kpi"><div class="kpi-label">Reply Rate</div><div class="kpi-value" id="k-reply">—</div><div class="kpi-sub">30-day avg</div></div>
+        <div class="kpi"><div class="kpi-label">Active Campaigns</div><div class="kpi-value" id="k-campaigns">—</div></div>
+        <div class="kpi"><div class="kpi-label">Contacts</div><div class="kpi-value" id="k-contacts">—</div></div>
+        <div class="kpi"><div class="kpi-label">Sent This Week</div><div class="kpi-value" id="k-sent">—</div></div>
+        <div class="kpi"><div class="kpi-label">Open Rate</div><div class="kpi-value" id="k-open">—</div><div class="kpi-sub">all time</div></div>
+      </div>
+      <div class="kpi-grid" style="margin-top:-4px">
+        <div class="kpi"><div class="kpi-label">Pending Review</div><div class="kpi-value" id="k-review" style="color:#d97706">—</div></div>
+        <div class="kpi"><div class="kpi-label">Failed Jobs</div><div class="kpi-value" id="k-jobs" style="color:#dc2626">—</div></div>
+        <div class="kpi"><div class="kpi-label">Reply Rate</div><div class="kpi-value" id="k-reply">—</div></div>
+        <div class="kpi"><div class="kpi-label">Bounce Rate</div><div class="kpi-value" id="k-bounce">—</div></div>
       </div>
       <div class="card">
-        <div class="card-head">
-          <span class="card-head-title">Today</span>
-          <span id="today-date" style="font-size:12px;color:#94a3b8"></span>
-        </div>
-        <div id="today-stats" class="card-body">
-          <div class="spinner"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head">
-          <span class="card-head-title">Recent Prospects</span>
-          <button class="btn-sm btn-outline" onclick="nav('prospects')">View all</button>
-        </div>
-        <div id="recent-list"></div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:4px">
-        <button class="btn btn-primary" id="runBtn" onclick="runPipeline()" style="font-size:14px;padding:12px">Run Pipeline Now</button>
+        <div class="card-head"><span class="card-head-title">System Status</span><button class="btn-sm btn-outline" onclick="loadDashboard()">Refresh</button></div>
+        <div id="dash-status" class="card-body"><div class="spinner"></div></div>
       </div>
     </div>
 
-    <!-- Prospects -->
-    <div id="page-prospects" class="page">
-      <div class="page-title">Prospects</div>
+    <!-- Campaigns -->
+    <div id="page-campaigns" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Campaigns</div>
+        <button class="btn-sm btn-primary" onclick="showCreateCampaign()">+ New</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-status="all" onclick="setCampFilter('all')">All</button>
+        <button class="filter-btn" data-status="active" onclick="setCampFilter('active')">Active</button>
+        <button class="filter-btn" data-status="draft" onclick="setCampFilter('draft')">Draft</button>
+        <button class="filter-btn" data-status="paused" onclick="setCampFilter('paused')">Paused</button>
+      </div>
+      <div id="campaigns-list"></div>
+    </div>
+
+    <!-- Contacts -->
+    <div id="page-contacts" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Contacts</div>
+      </div>
       <div class="search-wrap">
-        <div class="search-icon">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input type="search" id="contactSearch" placeholder="Search by name, email, company..." oninput="doContactSearch()">
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-status="all" onclick="setContactFilter('all')">All</button>
+        <button class="filter-btn" data-status="pending" onclick="setContactFilter('pending')">Pending</button>
+        <button class="filter-btn" data-status="sent" onclick="setContactFilter('sent')">Sent</button>
+        <button class="filter-btn" data-status="opened" onclick="setContactFilter('opened')">Opened</button>
+        <button class="filter-btn" data-status="replied" onclick="setContactFilter('replied')">Replied</button>
+        <button class="filter-btn" data-status="unsubscribed" onclick="setContactFilter('unsubscribed')">Unsubscribed</button>
+      </div>
+      <div id="contacts-list"></div>
+      <div class="pager" id="contacts-pager" style="display:none">
+        <span class="pager-info" id="contacts-pager-info"></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-outline" id="contacts-prev" onclick="changeContactPage(-1)">Prev</button>
+          <button class="btn-sm btn-outline" id="contacts-next" onclick="changeContactPage(1)">Next</button>
         </div>
-        <input type="search" id="searchInput" placeholder="Search by name, company, email..." oninput="doSearch()">
-      </div>
-      <div class="filter-row" id="filterRow">
-        <button class="filter-btn active" data-status="all" onclick="setFilter('all')">All</button>
-        <button class="filter-btn" data-status="pending" onclick="setFilter('pending')">Pending</button>
-        <button class="filter-btn" data-status="sent" onclick="setFilter('sent')">Sent</button>
-        <button class="filter-btn" data-status="opened" onclick="setFilter('opened')">Opened</button>
-        <button class="filter-btn" data-status="replied" onclick="setFilter('replied')">Replied</button>
-        <button class="filter-btn" data-status="bounced" onclick="setFilter('bounced')">Bounced</button>
-      </div>
-      <div id="prospects-list"></div>
-      <div class="pager" id="pager" style="display:none">
-        <button class="btn-sm btn-outline" id="prevBtn" onclick="changePage(-1)">Previous</button>
-        <span class="pager-info" id="pager-info"></span>
-        <button class="btn-sm btn-outline" id="nextBtn" onclick="changePage(1)">Next</button>
       </div>
     </div>
 
-    <!-- Admin / Settings -->
-    <div id="page-admin" class="page">
-      <div class="page-title">Settings</div>
-      <div class="card" id="cfg-card">
-        <div class="card-head"><span class="card-head-title">Configuration</span></div>
-        <div class="card-body">
-          <div class="spinner"></div>
+    <!-- Review Queue -->
+    <div id="page-review" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Review Queue</div>
+        <span id="review-count" class="badge b-pending_review"></span>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-status="pending_review" onclick="setDraftFilter('pending_review')">Pending</button>
+        <button class="filter-btn" data-status="approved" onclick="setDraftFilter('approved')">Approved</button>
+        <button class="filter-btn" data-status="rejected" onclick="setDraftFilter('rejected')">Rejected</button>
+      </div>
+      <div id="drafts-list"></div>
+    </div>
+
+    <!-- Suppression -->
+    <div id="page-suppression" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Suppression List</div>
+        <button class="btn-sm btn-primary" onclick="showAddSuppression()">+ Add</button>
+      </div>
+      <div class="search-wrap">
+        <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input type="search" id="suppSearch" placeholder="Search email or domain..." oninput="doSuppSearch()">
+      </div>
+      <div id="suppression-list"></div>
+    </div>
+
+    <!-- Audit Log -->
+    <div id="page-audit" class="page">
+      <div class="page-title">Audit Log</div>
+      <div id="audit-list"></div>
+      <div class="pager" id="audit-pager" style="display:none">
+        <span class="pager-info" id="audit-pager-info"></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-outline" id="audit-prev" onclick="changeAuditPage(-1)">Prev</button>
+          <button class="btn-sm btn-outline" id="audit-next" onclick="changeAuditPage(1)">Next</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-head"><span class="card-head-title">Connection Tests</span></div>
-        <div class="card-body" id="test-section">
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:14px;font-weight:500;color:#374151">Claude (Anthropic)</span>
-                <button class="btn-sm btn-outline" onclick="testSvc('anthropic')">Test</button>
-              </div>
-              <div id="test-anthropic" class="test-result"></div>
-            </div>
-            <hr>
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:14px;font-weight:500;color:#374151">Apollo.io</span>
-                <button class="btn-sm btn-outline" onclick="testSvc('apollo')">Test</button>
-              </div>
-              <div id="test-apollo" class="test-result"></div>
-            </div>
-            <hr>
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:14px;font-weight:500;color:#374151">Hunter.io</span>
-                <button class="btn-sm btn-outline" onclick="testSvc('hunter')">Test</button>
-              </div>
-              <div id="test-hunter" class="test-result"></div>
-            </div>
-            <hr>
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:14px;font-weight:500;color:#374151">SMTP (Gmail)</span>
-                <button class="btn-sm btn-outline" onclick="testSvc('smtp')">Test</button>
-              </div>
-              <div id="test-smtp" class="test-result"></div>
-            </div>
-          </div>
-        </div>
+    </div>
+
+    <!-- Jobs -->
+    <div id="page-jobs" class="page">
+      <div class="page-header">
+        <div class="page-title" style="margin-bottom:0">Background Jobs</div>
+        <button class="btn-sm btn-outline" onclick="loadJobs()">Refresh</button>
       </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-status="all" onclick="setJobFilter('all')">All</button>
+        <button class="filter-btn" data-status="pending" onclick="setJobFilter('pending')">Pending</button>
+        <button class="filter-btn" data-status="processing" onclick="setJobFilter('processing')">Processing</button>
+        <button class="filter-btn" data-status="completed" onclick="setJobFilter('completed')">Completed</button>
+        <button class="filter-btn" data-status="dead" onclick="setJobFilter('dead')">Failed</button>
+      </div>
+      <div id="jobs-list"></div>
     </div>
 
   </main>
 
-  <!-- Bottom Nav (mobile) -->
+  <!-- Bottom nav mobile -->
   <nav id="bottom-nav">
-    <button class="bn active" data-p="dashboard" onclick="nav('dashboard')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-      Home
-    </button>
-    <button class="bn" data-p="prospects" onclick="nav('prospects')">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Prospects
-    </button>
-    <button class="bn" data-p="admin" onclick="nav('admin')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-      Settings
-    </button>
+    <button class="bn active" data-p="dashboard" onclick="nav('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+    <button class="bn" data-p="campaigns" onclick="nav('campaigns')"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Campaigns</button>
+    <button class="bn" data-p="contacts" onclick="nav('contacts')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Contacts</button>
+    <button class="bn" data-p="review" onclick="nav('review')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review</button>
+    <button class="bn" data-p="jobs" onclick="nav('jobs')"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Jobs</button>
   </nav>
-
 </div>
 
-<!-- Modal overlay -->
 <div id="overlay" class="overlay" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modal-body"></div>
 </div>
 
 <script>
-const API = '/api';
+const API = '/api/v1';
 let _token = localStorage.getItem('outreach_token');
-let _filter = 'all';
-let _page = 1;
-let _total = 0;
-const LIMIT = 20;
+let _user = null;
+let _contactFilter = 'all', _contactPage = 1, _contactTotal = 0;
+let _campFilter = 'all';
+let _draftFilter = 'pending_review';
+let _jobFilter = 'all';
+let _auditPage = 1, _auditTotal = 0;
+let _suppSearch = '', _contactSearch = '';
+const LIMIT = 25;
 
-// Escape HTML
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function fmt(iso){ return iso ? new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—' }
 
 function badgeClass(s){
-  const m={pending:'b-pending',sent:'b-sent',opened:'b-opened',clicked:'b-clicked',replied:'b-replied',bounced:'b-bounced',unsubscribed:'b-unsubscribed'};
+  const m={pending:'b-pending',active:'b-active',draft:'b-draft',sent:'b-sent',opened:'b-opened',clicked:'b-clicked',replied:'b-replied',bounced:'b-bounced',unsubscribed:'b-unsubscribed',suppressed:'b-suppressed',approved:'b-approved',rejected:'b-rejected',pending_review:'b-pending_review',completed:'b-completed',processing:'b-processing',dead:'b-dead'};
   return m[(s||'').toLowerCase()]||'b-default';
 }
 
 // Auth
 document.getElementById('loginForm').addEventListener('submit', async function(e){
   e.preventDefault();
-  var btn=document.getElementById('loginBtn'), alrt=document.getElementById('loginAlert');
+  const btn=document.getElementById('loginBtn'), alrt=document.getElementById('loginAlert');
   btn.disabled=true; btn.textContent='Signing in...'; alrt.innerHTML='';
   try{
-    var r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:document.getElementById('loginPw').value})});
-    var d=await r.json();
-    if(!r.ok) throw new Error(d.error||'Invalid password');
-    _token=d.token||d.accessToken;
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:document.getElementById('loginEmail').value,password:document.getElementById('loginPw').value})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Invalid credentials');
+    _token=d.token; _user=d.user;
     localStorage.setItem('outreach_token',_token);
     showApp();
   }catch(err){
@@ -399,264 +328,402 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
 function logout(){
   localStorage.removeItem('outreach_token');
-  _token=null;
+  _token=null; _user=null;
   document.getElementById('app').classList.remove('visible');
   document.getElementById('gate').classList.remove('hidden');
   document.getElementById('loginPw').value='';
 }
 
-// API helper
 async function apiFetch(path, opts){
   opts=opts||{};
-  var r=await fetch(API+path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+_token},opts.headers||{})}));
+  const r=await fetch(API+path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+_token},opts.headers||{})}));
   if(r.status===401){logout();throw new Error('Session expired');}
-  if(!r.ok){var d=await r.json().catch(function(){return{};});throw new Error(d.error||d.message||'Request failed');}
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||d.message||'Request failed');}
   return r.json();
 }
 
 function showApp(){
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.add('visible');
+  if(_user) document.getElementById('userLabel').textContent=_user.email+' ('+_user.role+')';
   loadDashboard();
-  loadProspects();
-  loadConfig();
-  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
 
-// Navigation
 function nav(page){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  document.querySelectorAll('.ni,.bn').forEach(function(el){el.classList.toggle('active',el.dataset.p===page);});
+  document.querySelectorAll('.ni,.bn').forEach(el=>el.classList.toggle('active',el.dataset.p===page));
   document.getElementById('content').scrollTo(0,0);
+  if(page==='dashboard') loadDashboard();
+  else if(page==='campaigns') loadCampaigns();
+  else if(page==='contacts') loadContacts();
+  else if(page==='review') loadDrafts();
+  else if(page==='suppression') loadSuppression();
+  else if(page==='audit') loadAudit();
+  else if(page==='jobs') loadJobs();
 }
 
-// Dashboard
+// DASHBOARD
 async function loadDashboard(){
+  document.getElementById('dash-status').innerHTML='<div class="spinner"></div>';
   try{
-    var d=await apiFetch('/stats');
-    var t=d.totals||{};
-    document.getElementById('k-total').textContent=t.total_prospects||0;
-    document.getElementById('k-sent').textContent=t.total_sent||0;
-    document.getElementById('k-open').textContent=(t.open_rate||'0')+'%';
-    document.getElementById('k-reply').textContent=(t.reply_rate||'0')+'%';
+    const [stats, sys] = await Promise.all([
+      apiFetch('/analytics/dashboard'),
+      apiFetch('/admin/system').catch(()=>null)
+    ]);
+    document.getElementById('k-campaigns').textContent=stats.active_campaigns||0;
+    document.getElementById('k-contacts').textContent=stats.contacts_in_pipeline||0;
+    document.getElementById('k-sent').textContent=stats.emails_sent_this_week||0;
+    document.getElementById('k-open').textContent=(stats.overall_open_rate||0)+'%';
+    document.getElementById('k-review').textContent=stats.pending_review_count||0;
+    document.getElementById('k-jobs').textContent=stats.failed_jobs||0;
+    document.getElementById('k-reply').textContent=(stats.overall_reply_rate||0)+'%';
+    document.getElementById('k-bounce').textContent=(stats.overall_bounce_rate||0)+'%';
 
-    // Today stats
-    var today=d.today||{};
-    document.getElementById('today-stats').innerHTML=
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">'+
-      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#0f172a">'+(today.prospects_found||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Found</div></div>'+
-      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#2563eb">'+(today.emails_sent||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Sent</div></div>'+
-      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">'+(today.replies||0)+'</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Replies</div></div>'+
-      '</div>';
-
-    // Recent
-    var recent=d.recent||[];
-    if(recent.length){
-      document.getElementById('recent-list').innerHTML=recent.slice(0,8).map(function(p){
-        return '<div class="rl-item">'+
-          '<div><div class="rl-name">'+esc(p.contact_name||'Unknown')+'</div><div class="rl-co">'+esc(p.company_name||'')+'</div></div>'+
-          '<span class="badge '+badgeClass(p.status)+'">'+esc(p.status||'pending')+'</span>'+
-          '</div>';
-      }).join('');
-    } else {
-      document.getElementById('recent-list').innerHTML='<div class="empty">No prospects yet.<br>Run the pipeline to get started.</div>';
-    }
-  }catch(e){
-    document.getElementById('today-stats').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
-  }
-}
-
-// Pipeline
-async function runPipeline(){
-  var btn=document.getElementById('runBtn');
-  btn.disabled=true; btn.textContent='Running...';
-  try{
-    var d=await apiFetch('/pipeline/run',{method:'POST'});
-    btn.textContent='Pipeline Started!';
-    setTimeout(function(){btn.disabled=false;btn.textContent='Run Pipeline Now';loadDashboard();loadProspects();},3000);
-  }catch(e){
-    alert('Error: '+e.message);
-    btn.disabled=false; btn.textContent='Run Pipeline Now';
-  }
-}
-
-// Prospects
-async function loadProspects(){
-  var c=document.getElementById('prospects-list');
-  c.innerHTML='<div class="spinner"></div>';
-  try{
-    var params=new URLSearchParams({page:_page,limit:LIMIT});
-    if(_filter&&_filter!=='all') params.set('status',_filter);
-    var q=document.getElementById('searchInput');
-    if(q&&q.value.trim()) params.set('search',q.value.trim());
-    var d=await apiFetch('/prospects?'+params.toString());
-    var rows=d.prospects||[];
-    _total=d.total||0;
-    var pages=Math.ceil(_total/LIMIT);
-    if(!rows.length){
-      c.innerHTML='<div class="empty">No prospects found</div>';
-      document.getElementById('pager').style.display='none';
-      return;
-    }
-    c.innerHTML=rows.map(function(p){
-      var name=esc(p.contact_name||'Unknown');
-      var score=p.score?'Score: '+p.score:'';
-      var email=p.contact_email||'';
-      return '<div class="pc">'+
-        '<div class="pc-top">'+
-          '<div>'+
-            '<div class="pc-name">'+name+'</div>'+
-            '<div class="pc-meta">'+esc(p.company_name||'')+(score?' &middot; '+score:'')+'</div>'+
-          '</div>'+
-          '<span class="badge '+badgeClass(p.status)+'">'+esc(p.status||'pending')+'</span>'+
+    let sysHtml='';
+    if(sys){
+      sysHtml='<div class="stat-grid">'+
+        '<div class="stat-box"><div class="stat-val">'+sys.counts.users+'</div><div class="stat-lbl">Users</div></div>'+
+        '<div class="stat-box"><div class="stat-val">'+sys.counts.campaigns+'</div><div class="stat-lbl">Campaigns</div></div>'+
+        '<div class="stat-box"><div class="stat-val">'+sys.counts.contacts+'</div><div class="stat-lbl">Contacts</div></div>'+
         '</div>'+
-        (email?'<div class="pc-email">'+esc(email)+'</div>':'')+
-        '<div class="pc-actions">'+
-          '<button class="btn-sm btn-outline" onclick="showProspect('+JSON.stringify(p)+')">Details</button>'+
-          (email?'<button class="btn-sm btn-outline" onclick="copyEmail(\''+esc(email)+'\')">Copy Email</button>':'')+
-        '</div>'+
-      '</div>';
-    }).join('');
-    // Pager
-    if(pages>1){
-      document.getElementById('pager').style.display='flex';
-      document.getElementById('pager-info').textContent='Page '+_page+' of '+pages+' ('+_total+' total)';
-      document.getElementById('prevBtn').disabled=_page<=1;
-      document.getElementById('nextBtn').disabled=_page>=pages;
-    } else {
-      document.getElementById('pager').style.display='none';
+        '<div style="font-size:12px;color:#64748b;margin-bottom:8px"><strong>Queue:</strong> '+
+        Object.entries(sys.queue).map(([k,v])=>`${k}: ${v}`).join(' &bull; ')+'</div>'+
+        '<div style="font-size:12px;color:#64748b"><strong>Features:</strong> '+
+        Object.entries(sys.features).map(([k,v])=>'<span style="color:'+(v?'#16a34a':'#dc2626')+'">'+k+'</span>').join(' &bull; ')+'</div>';
     }
+    document.getElementById('dash-status').innerHTML=sysHtml||'<div class="alert alert-info">Analytics loaded. <a href="#" onclick="nav(\'campaigns\')">View campaigns →</a></div>';
   }catch(e){
-    c.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+    document.getElementById('dash-status').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
   }
 }
 
-function setFilter(s){
-  _filter=s; _page=1;
-  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.toggle('active',b.dataset.status===s);});
-  loadProspects();
+// CAMPAIGNS
+async function loadCampaigns(){
+  document.getElementById('campaigns-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const params=new URLSearchParams({page:1,limit:50});
+    if(_campFilter!=='all') params.set('status',_campFilter);
+    const d=await apiFetch('/campaigns?'+params);
+    const rows=d.data||d||[];
+    if(!rows.length){document.getElementById('campaigns-list').innerHTML='<div class="empty">No campaigns yet.</div>';return;}
+    document.getElementById('campaigns-list').innerHTML=rows.map(c=>`
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-head-title">${esc(c.name)}</div><div style="font-size:12px;color:#94a3b8">${c.contact_count||0} contacts &bull; ${c.daily_limit} /day</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span>
+            <button class="btn-sm btn-outline" onclick="showCampaignDetail('${esc(c.id)}')">View</button>
+            <button class="btn-sm btn-outline" onclick="cloneCampaign('${esc(c.id)}')">Clone</button>
+          </div>
+        </div>
+        ${c.description?'<div class="card-body" style="font-size:13px;color:#64748b">'+esc(c.description)+'</div>':''}
+      </div>`).join('');
+  }catch(e){document.getElementById('campaigns-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
 }
 
-var _searchTimer;
-function doSearch(){clearTimeout(_searchTimer);_searchTimer=setTimeout(function(){_page=1;loadProspects();},350);}
-
-function changePage(d){_page+=d;loadProspects();}
-
-function copyEmail(email){
-  navigator.clipboard.writeText(email).then(function(){showToast('Email copied!');}).catch(function(){alert(email);});
+function setCampFilter(s){
+  _campFilter=s;
+  document.querySelectorAll('#page-campaigns .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  loadCampaigns();
 }
 
-function showProspect(p){
-  var fields=[
-    ['Company',p.company_name],['Contact',p.contact_name],['Email',p.contact_email],
-    ['Title',p.contact_title],['Industry',p.industry],['Status',p.status],
-    ['Score',p.score],['Sent',p.sent_at?new Date(p.sent_at).toLocaleDateString():'—'],
-    ['Opened',p.opened_at?new Date(p.opened_at).toLocaleDateString():'—'],
-    ['Replied',p.replied_at?new Date(p.replied_at).toLocaleDateString():'—']
-  ].filter(function(f){return f[1];});
-  document.getElementById('modal-body').innerHTML=
-    '<div class="modal-title">'+esc(p.contact_name||p.company_name||'Prospect')+'</div>'+
-    '<div style="display:flex;flex-direction:column;gap:10px">'+
-    fields.map(function(f){return '<div><div style="font-size:11px;color:#94a3b8;font-weight:500;margin-bottom:2px">'+esc(f[0].toUpperCase())+'</div><div style="font-size:14px;color:#0f172a">'+esc(f[1])+'</div></div>';}).join('')+
-    '</div>'+
-    '<div class="modal-actions" style="margin-top:16px"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>';
+async function cloneCampaign(id){
+  try{
+    const c=await apiFetch('/campaigns/'+id+'/clone',{method:'POST',body:'{}'});
+    showToast('Campaign cloned: '+c.name);
+    loadCampaigns();
+  }catch(e){alert('Clone failed: '+e.message);}
+}
+
+function showCreateCampaign(){
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">New Campaign</div>
+    <div class="form-stack">
+      <div id="camp-alert"></div>
+      <div class="field"><label>Name</label><input id="camp-name" placeholder="e.g. Houston Healthcare Q2"></div>
+      <div class="field"><label>Description</label><textarea id="camp-desc" placeholder="Campaign description..."></textarea></div>
+      <div class="field"><label>Daily email limit</label><input id="camp-limit" type="number" value="10" min="1" max="100"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createCampaign()">Create</button>
+    </div>`;
   document.getElementById('overlay').style.display='flex';
 }
 
-// Config
-async function loadConfig(){
+async function createCampaign(){
+  const name=document.getElementById('camp-name').value.trim();
+  if(!name){document.getElementById('camp-alert').innerHTML='<div class="alert alert-error">Name required</div>';return;}
   try{
-    var d=await apiFetch('/admin/config');
-    var fields=[
-      {group:'API Keys',items:[
-        {k:'ANTHROPIC_API_KEY',label:'Anthropic API Key',type:'password'},
-        {k:'APOLLO_API_KEY',label:'Apollo.io API Key',type:'password'},
-        {k:'HUNTER_API_KEY',label:'Hunter.io API Key',type:'password'},
-      ]},
-      {group:'Email (SMTP)',items:[
-        {k:'SMTP_USER',label:'Gmail Address',type:'text'},
-        {k:'SMTP_PASS',label:'Gmail App Password',type:'password'},
-        {k:'FROM_NAME',label:'From Name',type:'text'},
-        {k:'FROM_EMAIL',label:'From Email',type:'email'},
-      ]},
-      {group:'Pipeline Settings',items:[
-        {k:'TARGET_INDUSTRIES',label:'Target Industries (comma-separated)',type:'text'},
-        {k:'TARGET_CITIES',label:'Target Cities (comma-separated)',type:'text'},
-        {k:'DAILY_PROSPECT_LIMIT',label:'Prospects Per Day',type:'number'},
-        {k:'EMAILS_PER_DAY',label:'Emails Per Day',type:'number'},
-        {k:'SEND_WINDOW_START',label:'Send Window Start (hour 0-23)',type:'number'},
-        {k:'SEND_WINDOW_END',label:'Send Window End (hour 0-23)',type:'number'},
-      ]},
-      {group:'Security',items:[
-        {k:'ADMIN_PASSWORD',label:'Admin Password',type:'password'},
-      ]},
-    ];
-
-    var html='<div id="cfg-alert"></div><div style="display:flex;flex-direction:column;gap:20px">';
-    fields.forEach(function(g){
-      html+='<div><div class="cfg-title">'+esc(g.group)+'</div><div class="cfg-grid">';
-      g.items.forEach(function(f){
-        html+='<div class="cfg-field"><label>'+esc(f.label)+'</label>'+
-          '<input type="'+f.type+'" data-key="'+f.k+'" value="'+esc(d[f.k]||'')+'" placeholder="'+(f.type==='password'?'unchanged':'')+'" class="cfg-input"></div>';
-      });
-      html+='</div></div>';
-    });
-    html+='</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="saveConfig()" id="saveBtn">Save Settings</button></div>';
-
-    document.querySelector('#cfg-card .card-body').innerHTML=html;
-  }catch(e){
-    document.querySelector('#cfg-card .card-body').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
-  }
+    await apiFetch('/campaigns',{method:'POST',body:JSON.stringify({name,description:document.getElementById('camp-desc').value,daily_limit:parseInt(document.getElementById('camp-limit').value)||10})});
+    closeModal(); loadCampaigns(); showToast('Campaign created!');
+  }catch(e){document.getElementById('camp-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
 }
 
-async function saveConfig(){
-  var btn=document.getElementById('saveBtn');
-  var alrt=document.getElementById('cfg-alert');
-  btn.disabled=true; btn.textContent='Saving...'; alrt.innerHTML='';
+async function showCampaignDetail(id){
   try{
-    var updates={};
-    document.querySelectorAll('.cfg-input').forEach(function(el){
-      var v=el.value.trim();
-      if(v) updates[el.dataset.key]=v;
-    });
-    var d=await apiFetch('/admin/config',{method:'POST',body:JSON.stringify(updates)});
-    alrt.innerHTML='<div class="alert alert-success">'+esc(d.status||'Saved!')+'</div>';
-  }catch(e){
-    alrt.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
-  }
-  btn.disabled=false; btn.textContent='Save Settings';
+    const [c,stats]=await Promise.all([apiFetch('/campaigns/'+id),apiFetch('/analytics/campaigns/'+id).catch(()=>null)]);
+    const s=stats||{};
+    document.getElementById('modal-body').innerHTML=`
+      <div class="modal-title">${esc(c.name)}</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val">${s.total_sent||0}</div><div class="stat-lbl">Sent</div></div>
+        <div class="stat-box"><div class="stat-val">${s.open_rate||0}%</div><div class="stat-lbl">Opens</div></div>
+        <div class="stat-box"><div class="stat-val">${s.reply_rate||0}%</div><div class="stat-lbl">Replies</div></div>
+      </div>
+      <div style="font-size:13px;color:#64748b;display:flex;flex-direction:column;gap:6px">
+        <div><strong>Status:</strong> <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span></div>
+        <div><strong>Daily limit:</strong> ${c.daily_limit} emails</div>
+        <div><strong>Contacts:</strong> ${c.contact_count||0}</div>
+        ${c.description?'<div><strong>Description:</strong> '+esc(c.description)+'</div>':''}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        ${c.status==='draft'?'<button class="btn btn-success" onclick="setCampaignStatus(\''+id+'\',\'active\')">Activate</button>':''}
+        ${c.status==='active'?'<button class="btn btn-secondary" onclick="setCampaignStatus(\''+id+'\',\'paused\')">Pause</button>':''}
+        ${c.status==='paused'?'<button class="btn btn-success" onclick="setCampaignStatus(\''+id+'\',\'active\')">Resume</button>':''}
+        <button class="btn btn-danger-outline" onclick="setCampaignStatus('${id}','archived')">Archive</button>
+      </div>`;
+    document.getElementById('overlay').style.display='flex';
+  }catch(e){alert('Error: '+e.message);}
 }
 
-async function testSvc(svc){
-  var el=document.getElementById('test-'+svc);
-  el.innerHTML='<span style="color:#94a3b8;font-size:12px">Testing...</span>';
+async function setCampaignStatus(id, status){
   try{
-    var d=await apiFetch('/admin/test/'+svc,{method:'POST',body:'{}'});
-    el.innerHTML='<span class="'+(d.success?'test-ok':'test-fail')+'">'+esc(d.message)+'</span>';
-  }catch(e){
-    el.innerHTML='<span class="test-fail">'+esc(e.message)+'</span>';
-  }
+    await apiFetch('/campaigns/'+id,{method:'PUT',body:JSON.stringify({status})});
+    closeModal(); loadCampaigns(); showToast('Campaign '+status);
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// CONTACTS
+async function loadContacts(){
+  document.getElementById('contacts-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const params=new URLSearchParams({page:_contactPage,limit:LIMIT});
+    if(_contactFilter!=='all') params.set('status',_contactFilter);
+    if(_contactSearch) params.set('search',_contactSearch);
+    const d=await apiFetch('/contacts?'+params);
+    const rows=d.data||[];
+    _contactTotal=d.total||0;
+    const pages=Math.ceil(_contactTotal/LIMIT);
+    if(!rows.length){document.getElementById('contacts-list').innerHTML='<div class="empty">No contacts found.</div>';document.getElementById('contacts-pager').style.display='none';return;}
+    document.getElementById('contacts-list').innerHTML=rows.map(c=>`
+      <div class="row-item">
+        <div style="min-width:0">
+          <div class="row-name">${esc((c.first_name||'')+' '+(c.last_name||''))}</div>
+          <div class="row-sub">${esc(c.email||'')} ${c.company_name?'&bull; '+esc(c.company_name):''}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+          <span class="badge ${badgeClass(c.status)}">${esc(c.status||'pending')}</span>
+        </div>
+      </div>`).join('');
+    if(pages>1){
+      document.getElementById('contacts-pager').style.display='flex';
+      document.getElementById('contacts-pager-info').textContent='Page '+_contactPage+' of '+pages+' ('+_contactTotal+')';
+      document.getElementById('contacts-prev').disabled=_contactPage<=1;
+      document.getElementById('contacts-next').disabled=_contactPage>=pages;
+    } else document.getElementById('contacts-pager').style.display='none';
+  }catch(e){document.getElementById('contacts-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+function setContactFilter(s){
+  _contactFilter=s; _contactPage=1;
+  document.querySelectorAll('#page-contacts .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  loadContacts();
+}
+function changeContactPage(d){_contactPage+=d;loadContacts();}
+let _csTimer; function doContactSearch(){_contactSearch=document.getElementById('contactSearch').value;clearTimeout(_csTimer);_csTimer=setTimeout(()=>{_contactPage=1;loadContacts();},350);}
+
+// DRAFTS / REVIEW QUEUE
+async function loadDrafts(){
+  document.getElementById('drafts-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const d=await apiFetch('/messages/drafts?status='+_draftFilter+'&limit=50');
+    const rows=d.data||[];
+    document.getElementById('review-count').textContent=rows.length+' drafts';
+    if(!rows.length){document.getElementById('drafts-list').innerHTML='<div class="empty">No drafts in this status.</div>';return;}
+    document.getElementById('drafts-list').innerHTML=rows.map(r=>`
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">${esc(r.subject||'(no subject)')}</div>
+            <div style="font-size:12px;color:#94a3b8">${fmt(r.created_at)} &bull; Model: ${esc(r.ai_model||'—')}</div>
+          </div>
+          <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span>
+        </div>
+        <div class="card-body">
+          <div class="draft-body">${esc(r.body||'').substring(0,400)}${r.body&&r.body.length>400?'…':''}</div>
+          ${r.spam_score>0?'<div style="font-size:12px;color:#d97706;margin-top:8px">⚠ Spam score: '+r.spam_score+'</div>':''}
+          ${r.status==='pending_review'?`<div class="modal-actions" style="margin-top:12px">
+            <button class="btn btn-success" onclick="approveDraft('${esc(r.id)}')">Approve &amp; Send</button>
+            <button class="btn btn-danger-outline" onclick="rejectDraft('${esc(r.id)}')">Reject</button>
+          </div>`:''}
+        </div>
+      </div>`).join('');
+  }catch(e){document.getElementById('drafts-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+function setDraftFilter(s){
+  _draftFilter=s;
+  document.querySelectorAll('#page-review .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  loadDrafts();
+}
+
+async function approveDraft(id){
+  try{
+    await apiFetch('/messages/drafts/'+id+'/approve',{method:'POST',body:'{}'});
+    showToast('Draft approved — queued for sending');
+    loadDrafts();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function rejectDraft(id){
+  const reason=prompt('Rejection reason (optional):');
+  try{
+    await apiFetch('/messages/drafts/'+id+'/reject',{method:'POST',body:JSON.stringify({reason:reason||''})});
+    showToast('Draft rejected');
+    loadDrafts();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// SUPPRESSION
+async function loadSuppression(){
+  document.getElementById('suppression-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const params=new URLSearchParams({limit:100});
+    if(_suppSearch) params.set('search',_suppSearch);
+    const d=await apiFetch('/suppression?'+params);
+    const rows=d.data||[];
+    if(!rows.length){document.getElementById('suppression-list').innerHTML='<div class="empty">No suppressed emails or domains.</div>';return;}
+    document.getElementById('suppression-list').innerHTML='<div class="card"><div>'+rows.map(s=>`
+      <div class="row-item">
+        <div><div class="row-name">${esc(s.email||('@'+s.domain))}</div><div class="row-sub">${esc(s.reason)} &bull; ${fmt(s.created_at)}</div></div>
+        <button class="btn-sm btn-danger-outline" onclick="removeSuppression('${esc(s.id)}')">Remove</button>
+      </div>`).join('')+'</div></div>';
+  }catch(e){document.getElementById('suppression-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+let _ssTimer; function doSuppSearch(){_suppSearch=document.getElementById('suppSearch').value;clearTimeout(_ssTimer);_ssTimer=setTimeout(loadSuppression,350);}
+
+function showAddSuppression(){
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">Add to Suppression</div>
+    <div class="form-stack">
+      <div id="supp-alert"></div>
+      <div class="field"><label>Email or Domain (e.g. user@co.com or co.com)</label><input id="supp-val" placeholder="email@example.com or example.com"></div>
+      <div class="field"><label>Reason</label><select id="supp-reason"><option value="manual">Manual</option><option value="complaint">Complaint</option><option value="do_not_contact">Do Not Contact</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addSuppression()">Add</button>
+    </div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+
+async function addSuppression(){
+  const val=document.getElementById('supp-val').value.trim();
+  const reason=document.getElementById('supp-reason').value;
+  if(!val){document.getElementById('supp-alert').innerHTML='<div class="alert alert-error">Value required</div>';return;}
+  try{
+    const body=val.includes('@')&&!val.startsWith('@')?{email:val,reason}:{domain:val.replace(/^@/,''),reason};
+    await apiFetch('/suppression',{method:'POST',body:JSON.stringify(body)});
+    closeModal(); loadSuppression(); showToast('Added to suppression list');
+  }catch(e){document.getElementById('supp-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+async function removeSuppression(id){
+  if(!confirm('Remove from suppression list?')) return;
+  try{
+    await apiFetch('/suppression/'+id,{method:'DELETE'});
+    showToast('Removed from suppression'); loadSuppression();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// AUDIT LOG
+async function loadAudit(){
+  document.getElementById('audit-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const d=await apiFetch('/audit?page='+_auditPage+'&limit=50');
+    const rows=d.data||[];
+    _auditTotal=d.total||0;
+    if(!rows.length){document.getElementById('audit-list').innerHTML='<div class="empty">No audit events.</div>';return;}
+    document.getElementById('audit-list').innerHTML='<div class="card"><div>'+rows.map(r=>`
+      <div class="row-item">
+        <div style="min-width:0">
+          <div class="row-name">${esc(r.action)}</div>
+          <div class="row-sub">${esc(r.user_email||'system')} &bull; ${esc(r.entity_type||'')} &bull; ${fmt(r.created_at)}</div>
+        </div>
+      </div>`).join('')+'</div></div>';
+    const pages=Math.ceil(_auditTotal/50);
+    if(pages>1){
+      document.getElementById('audit-pager').style.display='flex';
+      document.getElementById('audit-pager-info').textContent='Page '+_auditPage+' of '+pages+' ('+_auditTotal+')';
+      document.getElementById('audit-prev').disabled=_auditPage<=1;
+      document.getElementById('audit-next').disabled=_auditPage>=pages;
+    } else document.getElementById('audit-pager').style.display='none';
+  }catch(e){document.getElementById('audit-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+function changeAuditPage(d){_auditPage+=d;loadAudit();}
+
+// JOBS
+async function loadJobs(){
+  document.getElementById('jobs-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const params=new URLSearchParams({page:1,limit:50});
+    if(_jobFilter!=='all') params.set('status',_jobFilter);
+    const d=await apiFetch('/admin/jobs?'+params);
+    const rows=d.data||[];
+    if(!rows.length){document.getElementById('jobs-list').innerHTML='<div class="empty">No jobs found.</div>';return;}
+    document.getElementById('jobs-list').innerHTML='<div class="card"><div>'+rows.map(j=>`
+      <div class="row-item">
+        <div style="min-width:0">
+          <div class="row-name">${esc(j.type)}</div>
+          <div class="row-sub">${esc(j.status)} &bull; attempts: ${j.attempts}/${j.max_attempts} &bull; ${fmt(j.created_at)}</div>
+          ${j.error_message?'<div style="font-size:11px;color:#dc2626;margin-top:2px">'+esc(j.error_message.substring(0,80))+'</div>':''}
+        </div>
+        <div class="row-actions">
+          ${(j.status==='dead'||j.status==='failed')?'<button class="btn-sm btn-outline" onclick="retryJob(\''+esc(j.id)+'\')">Retry</button>':''}
+          ${j.status==='dead'?'<button class="btn-sm btn-danger-outline" onclick="deleteJob(\''+esc(j.id)+'\')">Delete</button>':''}
+        </div>
+      </div>`).join('')+'</div></div>';
+  }catch(e){document.getElementById('jobs-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+function setJobFilter(s){
+  _jobFilter=s;
+  document.querySelectorAll('#page-jobs .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  loadJobs();
+}
+
+async function retryJob(id){
+  try{await apiFetch('/admin/jobs/'+id+'/retry',{method:'POST',body:'{}'});showToast('Job queued for retry');loadJobs();}
+  catch(e){alert('Error: '+e.message);}
+}
+async function deleteJob(id){
+  if(!confirm('Delete this job?')) return;
+  try{await apiFetch('/admin/jobs/'+id,{method:'DELETE'});showToast('Job deleted');loadJobs();}
+  catch(e){alert('Error: '+e.message);}
 }
 
 // Modal
 function closeModal(){document.getElementById('overlay').style.display='none';}
 
 // Toast
-var _toastTimer;
+let _toastTimer;
 function showToast(msg){
-  var t=document.getElementById('_toast');
+  let t=document.getElementById('_toast');
   if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;white-space:nowrap';document.body.appendChild(t);}
   t.textContent=msg;t.style.display='block';
-  clearTimeout(_toastTimer);_toastTimer=setTimeout(function(){t.style.display='none';},2500);
+  clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>{t.style.display='none';},2500);
 }
 
-// Init
+// Init: try to restore session
 (async function(){
   if(_token){
     try{
-      // Quick validation: fetch stats to test token
-      await apiFetch('/stats');
+      const me=await apiFetch('/auth/me');
+      _user=me;
       showApp();
     }catch(e){
       localStorage.removeItem('outreach_token');
@@ -665,5 +732,4 @@ function showToast(msg){
   }
 })();
 </script>
-</body>
-</html>
+</body></html>
