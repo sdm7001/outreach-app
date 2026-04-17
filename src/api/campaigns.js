@@ -284,7 +284,7 @@ router.get('/:id/analytics', asyncHandler(async (req, res) => {
   const { start_date, end_date } = req.query;
   const [stats, sequence, trend] = await Promise.all([
     analyticsService.getCampaignStats(req.params.id, { startDate: start_date, endDate: end_date }),
-    analyticsService.getSequenceStepStats(req.params.id).catch(() => []),
+    Promise.resolve().then(() => analyticsService.getSequenceStepStats(req.params.id)).catch(() => []),
     campaignService.getMetricsTrend(req.params.id, 14),
   ]);
   res.json({ ...stats, sequence_funnel: sequence, trend });
