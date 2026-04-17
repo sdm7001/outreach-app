@@ -23,7 +23,7 @@ async function discoverHandler(payload) {
   }
 
   let icp = {};
-  try { icp = JSON.parse(campaign.icp_config || '{}'); } catch (_) {}
+  try { icp = JSON.parse(campaign.icp_config || '{}'); } catch (_) { /* ignore */ }
 
   if (!config.APOLLO_API_KEY && !config.GOOGLE_PLACES_API_KEY) {
     logger.info('Discovery: no API keys configured, skipping', { campaignId });

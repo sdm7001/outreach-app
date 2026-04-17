@@ -83,7 +83,7 @@ async function _triggerScheduledRun(campaign) {
 
   // Check max_runs via schedule_config
   let scheduleCfg = {};
-  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) {}
+  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) { /* ignore */ }
 
   const maxRuns = scheduleCfg.max_runs || null;
   const runCount = scheduleCfg.run_count || 0;
@@ -148,7 +148,7 @@ async function _triggerScheduledRun(campaign) {
         last_run_status: 'scheduler_error',
         last_run_at: new Date().toISOString(),
       });
-    } catch (_) {}
+    } catch (_) { /* ignore secondary error during error handling */ }
   }
 }
 
@@ -158,7 +158,7 @@ async function _triggerScheduledRun(campaign) {
  */
 function _calculateNextRun(campaign) {
   let scheduleCfg = {};
-  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) {}
+  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) { /* ignore */ }
 
   return getNextCampaignRun(scheduleCfg, campaign.timezone || 'America/Chicago', new Date());
 }

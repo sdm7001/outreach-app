@@ -263,7 +263,7 @@ function getEffectiveSenderConfig(campaignId) {
   if (!campaign) throw new NotFoundError(`Campaign ${campaignId} not found`);
 
   let senderConfig = {};
-  try { senderConfig = JSON.parse(campaign.sender_config || '{}'); } catch (_) {}
+  try { senderConfig = JSON.parse(campaign.sender_config || '{}'); } catch (_) { /* ignore */ }
 
   const config = getConfig();
 

@@ -111,7 +111,7 @@ function getNextOccurrence(rrule, afterDate = new Date()) {
 function getNextCampaignRun(scheduleConfig, timezone, afterDate = new Date()) {
   const cfg = scheduleConfig || {};
   const windowStart = cfg.send_window_start ?? 8;   // default 8 AM local
-  const windowEnd   = cfg.send_window_end   ?? 17;  // default 5 PM local
+  const _windowEnd  = cfg.send_window_end   ?? 17;  // default 5 PM local
   const daysOfWeek  = cfg.days_of_week
     ? new Set(cfg.days_of_week.map(Number))
     : new Set([1, 2, 3, 4, 5]); // Mon-Fri
@@ -131,7 +131,7 @@ function getNextCampaignRun(scheduleConfig, timezone, afterDate = new Date()) {
     candidate.setDate(candidate.getDate() + (attempt === 0 ? 0 : 1));
 
     // Convert candidate to local hour in target timezone
-    const localHour = getLocalHour(candidate, timezone);
+    const _localHour = getLocalHour(candidate, timezone);
     const localDay  = getLocalDay(candidate, timezone);
 
     if (!daysOfWeek.has(localDay)) continue;
@@ -219,7 +219,7 @@ function buildRRuleFromConfig(cfg) {
 function isInSendWindow(campaign) {
   const timezone = campaign.timezone || 'America/Chicago';
   let scheduleCfg = {};
-  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) {}
+  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) { /* ignore */ }
 
   const windowStart = scheduleCfg.send_window_start ?? 8;
   const windowEnd   = scheduleCfg.send_window_end   ?? 17;

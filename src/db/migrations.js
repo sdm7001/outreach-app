@@ -388,9 +388,7 @@ const MIGRATIONS = [
         CREATE INDEX IF NOT EXISTS idx_metrics_snap_campaign ON campaign_metrics_snapshots(campaign_id, snapshot_date);
       `);
     }
-  }
-];
-
+  },
   {
     version: 7,
     description: 'Sender profiles, campaign schedule_enabled flag',

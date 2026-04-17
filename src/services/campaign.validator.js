@@ -8,6 +8,7 @@
 
 const { getDb } = require('../db');
 const { getConfig } = require('../config');
+const { NotFoundError } = require('../utils/errors');
 const logger = require('../utils/logger');
 let senderService;
 try { senderService = require('./sender.service'); } catch (_) { senderService = null; }
@@ -26,16 +27,16 @@ async function validateCampaign(campaignId) {
   const config = getConfig();
 
   const campaign = db.prepare('SELECT * FROM campaigns WHERE id = ?').get(campaignId);
-  if (!campaign) throw new Error(`Campaign ${campaignId} not found`);
+  if (!campaign) throw new NotFoundError(`Campaign ${campaignId} not found`);
 
-  let senderCfg, scheduleCfg;
+  let senderCfg;
   try { senderCfg = JSON.parse(campaign.sender_config || '{}'); } catch (_) { senderCfg = {}; }
-  try { scheduleCfg = JSON.parse(campaign.schedule_config || '{}'); } catch (_) { scheduleCfg = {}; }
+  try { JSON.parse(campaign.schedule_config || '{}'); } catch (_) { /* ignore */ }
 
   // Resolve effective sender config (merges sender profile + campaign overrides)
   let effectiveSender = null;
   if (senderService) {
-    try { effectiveSender = senderService.getEffectiveSenderConfig(campaignId); } catch (_) {}
+    try { effectiveSender = senderService.getEffectiveSenderConfig(campaignId); } catch (_) { /* ignore */ }
   }
 
   const results = [];
@@ -260,6 +261,7 @@ async function validateCampaign(campaignId) {
 function check(results, key, label, passed, severity, failMessage) {
   results.push({
     key,
+    category: key.split('.')[0],
     label,
     passed: !!passed,
     severity,

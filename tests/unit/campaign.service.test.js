@@ -15,6 +15,15 @@ beforeAll(async () => {
 });
 afterAll(() => { closeDb(); });
 beforeEach(() => {
+  db.prepare('DELETE FROM campaign_run_steps').run();
+  db.prepare('DELETE FROM campaign_runs').run();
+  db.prepare('DELETE FROM campaign_preflight_results').run();
+  db.prepare('DELETE FROM campaign_exclusions').run();
+  db.prepare('DELETE FROM campaign_metrics_snapshots').run();
+  db.prepare('DELETE FROM message_drafts').run();
+  db.prepare('DELETE FROM send_events').run();
+  db.prepare('DELETE FROM contacts').run();
+  db.prepare('DELETE FROM sequences').run();
   db.prepare('DELETE FROM campaigns').run();
 });
 
@@ -114,14 +123,14 @@ describe('deleteCampaign (archive)', () => {
 
 describe('activateCampaign', () => {
   it('transitions draft → active', () => {
-    const c = campaignService.createCampaign({ name: 'Activate Me' }, adminId);
+    const c = campaignService.createCampaign({ name: 'Activate Me', require_preflight: false }, adminId);
     expect(c.status).toBe('draft');
     const activated = campaignService.activateCampaign(c.id, adminId);
     expect(activated.status).toBe('active');
   });
 
   it('throws for invalid transition (archived → active)', () => {
-    const c = campaignService.createCampaign({ name: 'Archived' }, adminId);
+    const c = campaignService.createCampaign({ name: 'Archived', require_preflight: false }, adminId);
     db.prepare("UPDATE campaigns SET status='archived' WHERE id=?").run(c.id);
     expect(() => campaignService.activateCampaign(c.id, adminId)).toThrow();
   });
@@ -129,7 +138,7 @@ describe('activateCampaign', () => {
 
 describe('pauseCampaign', () => {
   it('transitions active → paused', () => {
-    const c = campaignService.createCampaign({ name: 'Pause Me' }, adminId);
+    const c = campaignService.createCampaign({ name: 'Pause Me', require_preflight: false }, adminId);
     campaignService.activateCampaign(c.id, adminId);
     const paused = campaignService.pauseCampaign(c.id);
     expect(paused.status).toBe('paused');
@@ -138,7 +147,7 @@ describe('pauseCampaign', () => {
 
 describe('resumeCampaign', () => {
   it('transitions paused → active', () => {
-    const c = campaignService.createCampaign({ name: 'Resume Me' }, adminId);
+    const c = campaignService.createCampaign({ name: 'Resume Me', require_preflight: false }, adminId);
     campaignService.activateCampaign(c.id, adminId);
     campaignService.pauseCampaign(c.id);
     const resumed = campaignService.resumeCampaign(c.id);
@@ -147,20 +156,22 @@ describe('resumeCampaign', () => {
 });
 
 describe('scheduleCampaign / unscheduleCampaign', () => {
-  it('schedules a draft campaign', () => {
+  it('schedules a ready campaign', () => {
     const c = campaignService.createCampaign({ name: 'Schedule Me' }, adminId);
+    db.prepare("UPDATE campaigns SET status='ready' WHERE id=?").run(c.id);
     const future = new Date(Date.now() + 86400000).toISOString();
     const scheduled = campaignService.scheduleCampaign(c.id, { scheduled_at: future, schedule_mode: 'once', timezone: 'America/Chicago' });
     expect(scheduled.status).toBe('scheduled');
     expect(scheduled.scheduled_at).toBe(future);
   });
 
-  it('unschedules back to draft', () => {
+  it('unschedules back to ready', () => {
     const c = campaignService.createCampaign({ name: 'Unschedule Me' }, adminId);
+    db.prepare("UPDATE campaigns SET status='ready' WHERE id=?").run(c.id);
     const future = new Date(Date.now() + 86400000).toISOString();
     campaignService.scheduleCampaign(c.id, { scheduled_at: future, schedule_mode: 'once' });
     const back = campaignService.unscheduleCampaign(c.id);
-    expect(back.status).toBe('draft');
+    expect(back.status).toBe('ready');
   });
 
   it('throws for missing scheduled_at', () => {
@@ -193,7 +204,7 @@ describe('createRun / getRun / listRuns / updateRun', () => {
     expect(run.id).toBeTruthy();
     expect(run.campaign_id).toBe(campId);
     expect(run.run_type).toBe('manual');
-    expect(run.status).toBe('queued');
+    expect(run.status).toBe('pending');
   });
 
   it('getRun retrieves the run', () => {

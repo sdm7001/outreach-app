@@ -16,6 +16,7 @@ beforeAll(async () => {
 });
 afterAll(() => { closeDb(); });
 beforeEach(() => {
+  db.prepare('DELETE FROM campaign_preflight_results').run();
   db.prepare('DELETE FROM campaigns').run();
 });
 
@@ -49,7 +50,7 @@ describe('validateCampaign', () => {
   it('persists result to campaign_preflight_results', async () => {
     const c = makeCampaign();
     await campaignValidator.validateCampaign(c.id);
-    const row = db.prepare('SELECT * FROM campaign_preflight_results WHERE campaign_id = ? ORDER BY created_at DESC LIMIT 1').get(c.id);
+    const row = db.prepare('SELECT * FROM campaign_preflight_results WHERE campaign_id = ? ORDER BY checked_at DESC LIMIT 1').get(c.id);
     expect(row).toBeTruthy();
     expect(row.campaign_id).toBe(c.id);
   });
