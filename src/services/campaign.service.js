@@ -12,7 +12,7 @@ const VALID_STATUSES = new Set([
 ]);
 
 const ALLOWED_TRANSITIONS = {
-  draft:            ['ready', 'validation_failed', 'active', 'archived'],
+  draft:            ['ready', 'validation_failed', 'active', 'running', 'archived'],
   validation_failed:['draft', 'ready', 'archived'],
   ready:            ['scheduled', 'active', 'running', 'archived', 'draft'],
   scheduled:        ['running', 'active', 'paused', 'archived', 'ready'],
@@ -20,7 +20,7 @@ const ALLOWED_TRANSITIONS = {
   running:          ['paused', 'completed', 'archived', 'errored', 'active'],
   paused:           ['active', 'running', 'scheduled', 'archived'],
   completed:        ['archived', 'draft'],
-  errored:          ['draft', 'active', 'archived'],
+  errored:          ['draft', 'active', 'running', 'archived'],
   archived:         [], // terminal — can only be un-archived via explicit action
 };
 
