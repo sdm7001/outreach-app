@@ -97,7 +97,6 @@ async function searchProspects(query, userId) {
 
 async function _searchViaApollo({ industries, locations, titles, keywords }, config) {
   const body = {
-    api_key: config.APOLLO_API_KEY,
     person_titles: (titles || []).slice(0, 5),
     q_organization_locations: (locations || []).slice(0, 3),
     q_organization_industries: (industries || []).slice(0, 5),
@@ -108,7 +107,10 @@ async function _searchViaApollo({ industries, locations, titles, keywords }, con
 
   const res = await axios.post('https://api.apollo.io/v1/mixed_people/search', body, {
     timeout: 10000,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Api-Key': config.APOLLO_API_KEY,
+    },
   });
 
   const people = res.data?.people || [];
