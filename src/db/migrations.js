@@ -244,7 +244,191 @@ const MIGRATIONS = [
         CREATE INDEX IF NOT EXISTS idx_daily_stats_campaign ON daily_stats(campaign_id);
       `);
     }
+  },
+  {
+    version: 6,
+    description: 'Enterprise campaign system — extended fields, runs, preflight, exclusions, metrics snapshots',
+    up(db) {
+      // Extend campaigns table (SQLite only supports ADD COLUMN)
+      const campCols = db.prepare("PRAGMA table_info(campaigns)").all().map(c => c.name);
+      const addCampaignCol = (col, def) => {
+        if (!campCols.includes(col)) db.exec(`ALTER TABLE campaigns ADD COLUMN ${col} ${def}`);
+      };
+      addCampaignCol('objective', 'TEXT');
+      addCampaignCol('priority', "TEXT DEFAULT 'normal'");
+      addCampaignCol('channel_type', "TEXT DEFAULT 'email'");
+      addCampaignCol('tags', "TEXT DEFAULT '[]'");
+      addCampaignCol('notes', 'TEXT');
+      addCampaignCol('owner_user_id', 'TEXT');
+      addCampaignCol('sequence_id', 'TEXT');
+      addCampaignCol('timezone', "TEXT DEFAULT 'America/Chicago'");
+      addCampaignCol('start_at', 'TEXT');
+      addCampaignCol('end_at', 'TEXT');
+      addCampaignCol('max_daily_sends', 'INTEGER DEFAULT 10');
+      addCampaignCol('max_hourly_sends', 'INTEGER DEFAULT 5');
+      addCampaignCol('allow_manual_runs', 'INTEGER DEFAULT 1');
+      addCampaignCol('require_preflight', 'INTEGER DEFAULT 1');
+      addCampaignCol('review_mode', "TEXT DEFAULT 'manual'");
+      addCampaignCol('auto_send_policy', "TEXT DEFAULT '{}'");
+      addCampaignCol('compliance_config', "TEXT DEFAULT '{}'");
+      addCampaignCol('schedule_mode', "TEXT DEFAULT 'manual'");
+      addCampaignCol('scheduled_at', 'TEXT');
+      addCampaignCol('last_run_at', 'TEXT');
+      addCampaignCol('last_run_status', 'TEXT');
+      addCampaignCol('next_run_at', 'TEXT');
+      addCampaignCol('archived_at', 'TEXT');
+      addCampaignCol('sender_profile_id', 'TEXT');
+      addCampaignCol('reply_to_email', 'TEXT');
+      addCampaignCol('preflight_status', "TEXT DEFAULT 'unchecked'");
+      addCampaignCol('preflight_score', 'INTEGER DEFAULT 0');
+      addCampaignCol('slug', 'TEXT');
+
+      // Extend sequence_steps table
+      const stepCols = db.prepare("PRAGMA table_info(sequence_steps)").all().map(c => c.name);
+      const addStepCol = (col, def) => {
+        if (!stepCols.includes(col)) db.exec(`ALTER TABLE sequence_steps ADD COLUMN ${col} ${def}`);
+      };
+      addStepCol('step_type', "TEXT DEFAULT 'email'");
+      addStepCol('send_window_start', 'INTEGER DEFAULT 8');
+      addStepCol('send_window_end', 'INTEGER DEFAULT 17');
+      addStepCol('business_days_only', 'INTEGER DEFAULT 1');
+      addStepCol('stop_on_reply', 'INTEGER DEFAULT 1');
+      addStepCol('stop_on_unsubscribe', 'INTEGER DEFAULT 1');
+      addStepCol('stop_on_bounce', 'INTEGER DEFAULT 1');
+      addStepCol('skip_condition', 'TEXT');
+      addStepCol('fallback_body', 'TEXT');
+      addStepCol('updated_at', 'TEXT');
+
+      db.exec(`
+        -- Campaign runs: track every execution event
+        CREATE TABLE IF NOT EXISTS campaign_runs (
+          id TEXT PRIMARY KEY,
+          campaign_id TEXT NOT NULL REFERENCES campaigns(id),
+          run_type TEXT NOT NULL DEFAULT 'manual',
+          triggered_by TEXT,
+          triggered_by_email TEXT,
+          stage TEXT DEFAULT 'all',
+          status TEXT NOT NULL DEFAULT 'pending',
+          started_at TEXT,
+          finished_at TEXT,
+          idempotency_key TEXT UNIQUE,
+          contacts_processed INTEGER DEFAULT 0,
+          contacts_skipped INTEGER DEFAULT 0,
+          emails_queued INTEGER DEFAULT 0,
+          emails_sent INTEGER DEFAULT 0,
+          emails_failed INTEGER DEFAULT 0,
+          drafts_generated INTEGER DEFAULT 0,
+          error_message TEXT,
+          notes TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_campaign_runs_campaign ON campaign_runs(campaign_id);
+        CREATE INDEX IF NOT EXISTS idx_campaign_runs_status ON campaign_runs(status, created_at);
+
+        -- Step-level log within a run
+        CREATE TABLE IF NOT EXISTS campaign_run_steps (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          run_id TEXT NOT NULL REFERENCES campaign_runs(id),
+          step_name TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'pending',
+          started_at TEXT,
+          finished_at TEXT,
+          items_processed INTEGER DEFAULT 0,
+          error_message TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_run_steps_run ON campaign_run_steps(run_id);
+
+        -- Preflight validation results
+        CREATE TABLE IF NOT EXISTS campaign_preflight_results (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          campaign_id TEXT NOT NULL REFERENCES campaigns(id),
+          checked_at TEXT NOT NULL DEFAULT (datetime('now')),
+          score INTEGER DEFAULT 0,
+          status TEXT NOT NULL DEFAULT 'unchecked',
+          results TEXT DEFAULT '[]',
+          blocking_count INTEGER DEFAULT 0,
+          warning_count INTEGER DEFAULT 0
+        );
+        CREATE INDEX IF NOT EXISTS idx_preflight_campaign ON campaign_preflight_results(campaign_id, checked_at);
+
+        -- Campaign-specific exclusion lists (beyond global suppression)
+        CREATE TABLE IF NOT EXISTS campaign_exclusions (
+          id TEXT PRIMARY KEY,
+          campaign_id TEXT NOT NULL REFERENCES campaigns(id),
+          email TEXT,
+          domain TEXT,
+          reason TEXT DEFAULT 'manual',
+          added_by TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_exclusions_campaign ON campaign_exclusions(campaign_id);
+        CREATE INDEX IF NOT EXISTS idx_exclusions_email ON campaign_exclusions(email) WHERE email IS NOT NULL;
+
+        -- Point-in-time metrics snapshots for trend analysis
+        CREATE TABLE IF NOT EXISTS campaign_metrics_snapshots (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          campaign_id TEXT NOT NULL REFERENCES campaigns(id),
+          snapshot_date TEXT NOT NULL,
+          contacts_total INTEGER DEFAULT 0,
+          contacts_pending INTEGER DEFAULT 0,
+          contacts_sent INTEGER DEFAULT 0,
+          contacts_opened INTEGER DEFAULT 0,
+          contacts_clicked INTEGER DEFAULT 0,
+          contacts_replied INTEGER DEFAULT 0,
+          contacts_bounced INTEGER DEFAULT 0,
+          contacts_unsubscribed INTEGER DEFAULT 0,
+          contacts_suppressed INTEGER DEFAULT 0,
+          drafts_pending INTEGER DEFAULT 0,
+          drafts_approved INTEGER DEFAULT 0,
+          drafts_rejected INTEGER DEFAULT 0,
+          jobs_queued INTEGER DEFAULT 0,
+          UNIQUE(campaign_id, snapshot_date)
+        );
+        CREATE INDEX IF NOT EXISTS idx_metrics_snap_campaign ON campaign_metrics_snapshots(campaign_id, snapshot_date);
+      `);
+    }
   }
+];
+
+  {
+    version: 7,
+    description: 'Sender profiles, campaign schedule_enabled flag',
+    up(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS sender_profiles (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          from_email TEXT NOT NULL,
+          from_name TEXT,
+          reply_to_email TEXT,
+          smtp_host TEXT,
+          smtp_port INTEGER DEFAULT 587,
+          smtp_user TEXT,
+          smtp_pass_enc TEXT,
+          daily_send_limit INTEGER DEFAULT 100,
+          hourly_send_limit INTEGER DEFAULT 20,
+          warmup_mode INTEGER DEFAULT 0,
+          warmup_limit INTEGER DEFAULT 10,
+          domain_verified INTEGER DEFAULT 0,
+          spf_verified INTEGER DEFAULT 0,
+          dkim_verified INTEGER DEFAULT 0,
+          active INTEGER DEFAULT 1,
+          owner_user_id TEXT REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_sender_profiles_owner ON sender_profiles(owner_user_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_sender_profiles_email ON sender_profiles(from_email);
+      `);
+
+      // Add schedule_enabled to campaigns if missing
+      const campCols = db.prepare('PRAGMA table_info(campaigns)').all().map(c => c.name);
+      if (!campCols.includes('schedule_enabled')) {
+        db.exec("ALTER TABLE campaigns ADD COLUMN schedule_enabled INTEGER DEFAULT 1");
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {

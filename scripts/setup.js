@@ -1,10 +1,10 @@
 'use strict';
 
-// Set required env vars before config loads
+require('dotenv').config();
+
+// Placeholders let getConfig() pass validation during setup; real values come from .env above
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'setup-script-placeholder-not-used';
 process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'setup-script-placeholder';
-
-require('dotenv').config();
 
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');

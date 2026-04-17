@@ -113,6 +113,47 @@ textarea{resize:none;height:80px}
 .stat-val{font-size:22px;font-weight:700;color:#0f172a}
 .stat-lbl{font-size:11px;color:#94a3b8;margin-top:2px}
 hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
+/* Campaign enterprise styles */
+.b-ready{background:#dcfce7;color:#166534}
+.b-scheduled{background:#e0f2fe;color:#0369a1}
+.b-running{background:#dbeafe;color:#1d4ed8}
+.b-paused{background:#fef9c3;color:#854d0e}
+.b-errored,.b-validation_failed{background:#fef2f2;color:#dc2626}
+.b-high{background:#fef9c3;color:#854d0e}.b-urgent{background:#fef2f2;color:#dc2626}
+.b-normal{background:#f1f5f9;color:#64748b}.b-low{background:#f8fafc;color:#94a3b8}
+.b-pass{background:#dcfce7;color:#166534}.b-fail{background:#fef2f2;color:#dc2626}
+.b-warn{background:#fef9c3;color:#854d0e}.b-unchecked{background:#f1f5f9;color:#64748b}
+/* Campaign detail sub-view */
+#camp-detail{display:none}.camp-detail-active #camp-list-wrap{display:none}.camp-detail-active #camp-detail{display:block}
+.camp-tabs{display:flex;gap:0;border-bottom:2px solid #e2e8f0;margin-bottom:16px;overflow-x:auto}
+.camp-tab{padding:9px 16px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:inherit;transition:all .15s}
+.camp-tab.active{color:#2563eb;border-bottom-color:#2563eb}
+.camp-tab-panel{display:none}.camp-tab-panel.active{display:block}
+/* Builder modal tabs */
+.builder-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.builder-tab{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-family:inherit;transition:all .15s}
+.builder-tab.active{background:#2563eb;border-color:#2563eb;color:#fff}
+.builder-panel{display:none}.builder-panel.active{display:block}
+/* Preflight check rows */
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f8fafc}
+.check-row:last-child{border-bottom:none}
+.check-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.check-dot.pass{background:#16a34a}.check-dot.fail{background:#dc2626}.check-dot.warn{background:#d97706}
+.check-dot.info{background:#2563eb}
+/* Run history */
+.run-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.run-row:last-child{border-bottom:none}
+/* Metrics funnel */
+.funnel{display:flex;flex-direction:column;gap:6px}
+.funnel-row{display:flex;align-items:center;gap:10px}
+.funnel-label{font-size:12px;color:#64748b;width:100px;flex-shrink:0}
+.funnel-bar-wrap{flex:1;background:#f1f5f9;border-radius:4px;height:18px;overflow:hidden}
+.funnel-bar{height:100%;border-radius:4px;transition:width .4s}
+.funnel-val{font-size:12px;font-weight:600;color:#0f172a;width:40px;text-align:right;flex-shrink:0}
+/* Sequence steps */
+.step-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.step-num{width:24px;height:24px;background:#2563eb;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.modal-wide{max-width:680px}
 </style>
 </head>
 <body>
@@ -141,6 +182,7 @@ hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
       <button class="ni" data-p="contacts" onclick="nav('contacts')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts</button>
       <button class="ni" data-p="review" onclick="nav('review')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Review Queue</button>
       <button class="ni" data-p="suppression" onclick="nav('suppression')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Suppression</button>
+      <button class="ni" data-p="senders" onclick="nav('senders')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Senders</button>
       <button class="ni" data-p="audit" onclick="nav('audit')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Audit Log</button>
       <button class="ni" data-p="jobs" onclick="nav('jobs')"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Jobs</button>
     </div>
@@ -175,17 +217,61 @@ hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
 
     <!-- Campaigns -->
     <div id="page-campaigns" class="page">
+      <!-- LIST VIEW -->
+      <div id="camp-list-wrap">
+        <div class="page-header">
+          <div class="page-title" style="margin-bottom:0">Campaigns</div>
+          <button class="btn-sm btn-primary" onclick="showCampBuilder()">+ New Campaign</button>
+        </div>
+        <div class="search-wrap">
+          <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <input type="search" id="campSearch" placeholder="Search campaigns..." oninput="doCampSearch()">
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" data-status="all" onclick="setCampFilter('all')">All</button>
+          <button class="filter-btn" data-status="active" onclick="setCampFilter('active')">Active</button>
+          <button class="filter-btn" data-status="running" onclick="setCampFilter('running')">Running</button>
+          <button class="filter-btn" data-status="scheduled" onclick="setCampFilter('scheduled')">Scheduled</button>
+          <button class="filter-btn" data-status="draft" onclick="setCampFilter('draft')">Draft</button>
+          <button class="filter-btn" data-status="paused" onclick="setCampFilter('paused')">Paused</button>
+          <button class="filter-btn" data-status="completed" onclick="setCampFilter('completed')">Completed</button>
+          <button class="filter-btn" data-status="archived" onclick="setCampFilter('archived')">Archived</button>
+        </div>
+        <div id="campaigns-list"></div>
+      </div>
+      <!-- DETAIL VIEW -->
+      <div id="camp-detail">
+        <div class="page-header" style="margin-bottom:12px">
+          <button class="btn-sm btn-outline" onclick="closeCampDetail()">← Back</button>
+          <div style="display:flex;gap:8px" id="camp-detail-actions"></div>
+        </div>
+        <div id="camp-detail-header" style="margin-bottom:16px"></div>
+        <div class="camp-tabs">
+          <button class="camp-tab active" onclick="campTab('overview')">Overview</button>
+          <button class="camp-tab" onclick="campTab('analytics')">Analytics</button>
+          <button class="camp-tab" onclick="campTab('sequence')">Sequence</button>
+          <button class="camp-tab" onclick="campTab('runs')">Run History</button>
+          <button class="camp-tab" onclick="campTab('exclusions')">Exclusions</button>
+          <button class="camp-tab" onclick="campTab('audit')">Audit Log</button>
+          <button class="camp-tab" onclick="campTab('settings')">Settings</button>
+        </div>
+        <div id="camp-tab-overview" class="camp-tab-panel active"></div>
+        <div id="camp-tab-analytics" class="camp-tab-panel"></div>
+        <div id="camp-tab-sequence" class="camp-tab-panel"></div>
+        <div id="camp-tab-runs" class="camp-tab-panel"></div>
+        <div id="camp-tab-exclusions" class="camp-tab-panel"></div>
+        <div id="camp-tab-audit" class="camp-tab-panel"></div>
+        <div id="camp-tab-settings" class="camp-tab-panel"></div>
+      </div>
+    </div>
+
+    <!-- Sender Profiles -->
+    <div id="page-senders" class="page">
       <div class="page-header">
-        <div class="page-title" style="margin-bottom:0">Campaigns</div>
-        <button class="btn-sm btn-primary" onclick="showCreateCampaign()">+ New</button>
+        <div class="page-title" style="margin-bottom:0">Sender Profiles</div>
+        <button class="btn-sm btn-primary" onclick="showSenderForm()">+ New Profile</button>
       </div>
-      <div class="filter-row">
-        <button class="filter-btn active" data-status="all" onclick="setCampFilter('all')">All</button>
-        <button class="filter-btn" data-status="active" onclick="setCampFilter('active')">Active</button>
-        <button class="filter-btn" data-status="draft" onclick="setCampFilter('draft')">Draft</button>
-        <button class="filter-btn" data-status="paused" onclick="setCampFilter('paused')">Paused</button>
-      </div>
-      <div id="campaigns-list"></div>
+      <div id="senders-list"><div class="spinner"></div></div>
     </div>
 
     <!-- Contacts -->
@@ -398,28 +484,71 @@ async function loadDashboard(){
   }
 }
 
-// CAMPAIGNS
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMPAIGNS — Enterprise Management System
+// ═══════════════════════════════════════════════════════════════════════════
+
+let _campSearch='', _campSearchTimer, _currentCamp=null, _currentCampTab='overview';
+
+// ── LIST ─────────────────────────────────────────────────────────────────
+
 async function loadCampaigns(){
   document.getElementById('campaigns-list').innerHTML='<div class="spinner"></div>';
   try{
     const params=new URLSearchParams({page:1,limit:50});
-    if(_campFilter!=='all') params.set('status',_campFilter);
+    if(_campFilter&&_campFilter!=='all') params.set('status',_campFilter);
+    if(_campSearch) params.set('search',_campSearch);
     const d=await apiFetch('/campaigns?'+params);
-    const rows=d.data||d||[];
-    if(!rows.length){document.getElementById('campaigns-list').innerHTML='<div class="empty">No campaigns yet.</div>';return;}
-    document.getElementById('campaigns-list').innerHTML=rows.map(c=>`
-      <div class="card">
-        <div class="card-head">
-          <div><div class="card-head-title">${esc(c.name)}</div><div style="font-size:12px;color:#94a3b8">${c.contact_count||0} contacts &bull; ${c.daily_limit} /day</div></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span>
-            <button class="btn-sm btn-outline" onclick="showCampaignDetail('${esc(c.id)}')">View</button>
-            <button class="btn-sm btn-outline" onclick="cloneCampaign('${esc(c.id)}')">Clone</button>
-          </div>
-        </div>
-        ${c.description?'<div class="card-body" style="font-size:13px;color:#64748b">'+esc(c.description)+'</div>':''}
-      </div>`).join('');
+    const rows=d.data||[];
+    if(!rows.length){
+      document.getElementById('campaigns-list').innerHTML=
+        '<div class="empty">No campaigns found.<br><button class="btn-sm btn-primary" style="margin-top:12px" onclick="showCampBuilder()">+ New Campaign</button></div>';
+      return;
+    }
+    document.getElementById('campaigns-list').innerHTML=rows.map(c=>campCard(c)).join('');
   }catch(e){document.getElementById('campaigns-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+function campCard(c){
+  const pf=c.preflight_status||'unchecked';
+  const pri=c.priority||'normal';
+  const lastRun=c.last_run_at_detail||c.last_run_at;
+  const nextRun=c.next_run_at;
+  return `<div class="card" style="cursor:pointer" onclick="openCampDetail('${esc(c.id)}')">
+    <div class="card-head">
+      <div style="min-width:0;flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="card-head-title">${esc(c.name)}</div>
+          <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span>
+          ${pri!=='normal'?`<span class="badge b-${esc(pri)}">${esc(pri)}</span>`:''}
+          <span class="badge b-${esc(pf)}" title="Preflight: ${esc(pf)}">✓ ${esc(pf)}</span>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:3px">
+          ${c.contact_count||0} contacts &bull; ${c.max_daily_sends||c.daily_limit||10}/day limit
+          ${lastRun?' &bull; Last run: '+fmtDate(lastRun):''}
+          ${nextRun?' &bull; Next: '+fmtDate(nextRun):''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:center" onclick="event.stopPropagation()">
+        <button class="btn-sm btn-outline" onclick="openCampDetail('${esc(c.id)}')">View</button>
+        <button class="btn-sm btn-outline" onclick="cloneCampaign('${esc(c.id)}')">Clone</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid #f1f5f9">
+      ${campMetricCell('Contacts',(c.contact_count||0).toLocaleString())}
+      ${campMetricCell('Sent',(c.sent_count||0).toLocaleString())}
+      ${campMetricCell('Pending',c.pending_drafts||0)}
+      ${campMetricCell('Mode',esc(c.schedule_mode||'manual'))}
+      ${campMetricCell('Review',esc(c.review_mode||'manual'))}
+    </div>
+  </div>`;
+}
+
+function campMetricCell(label,val){
+  return `<div style="padding:8px 12px;text-align:center;border-right:1px solid #f1f5f9">
+    <div style="font-size:13px;font-weight:600;color:#0f172a">${val}</div>
+    <div style="font-size:10px;color:#94a3b8">${label}</div>
+  </div>`;
 }
 
 function setCampFilter(s){
@@ -428,73 +557,1000 @@ function setCampFilter(s){
   loadCampaigns();
 }
 
+let _csTimer2; function doCampSearch(){
+  _campSearch=document.getElementById('campSearch').value;
+  clearTimeout(_csTimer2); _csTimer2=setTimeout(loadCampaigns,350);
+}
+
 async function cloneCampaign(id){
   try{
     const c=await apiFetch('/campaigns/'+id+'/clone',{method:'POST',body:'{}'});
-    showToast('Campaign cloned: '+c.name);
-    loadCampaigns();
+    showToast('Campaign cloned: '+c.name); loadCampaigns();
   }catch(e){alert('Clone failed: '+e.message);}
 }
 
-function showCreateCampaign(){
+// ── DETAIL VIEW ─────────────────────────────────────────────────────────
+
+async function openCampDetail(id){
+  _currentCamp=null;
+  document.getElementById('page-campaigns').classList.add('camp-detail-active');
+  document.getElementById('camp-detail-header').innerHTML='<div class="spinner"></div>';
+  try{
+    _currentCamp=await apiFetch('/campaigns/'+id);
+    renderCampDetailHeader(_currentCamp);
+    campTab(_currentCampTab);
+  }catch(e){
+    document.getElementById('camp-detail-header').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+}
+
+function closeCampDetail(){
+  _currentCamp=null;
+  document.getElementById('page-campaigns').classList.remove('camp-detail-active');
+  loadCampaigns();
+}
+
+function renderCampDetailHeader(c){
+  const pf=c.preflight_status||'unchecked';
+  document.getElementById('camp-detail-header').innerHTML=`
+    <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:4px">${esc(c.name)}</h2>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+          <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span>
+          <span class="badge b-${esc(c.priority||'normal')}">${esc(c.priority||'normal')}</span>
+          <span class="badge b-${esc(pf)}">Preflight: ${esc(pf)}</span>
+          ${c.schedule_mode&&c.schedule_mode!=='manual'?`<span class="badge b-scheduled">${esc(c.schedule_mode)}</span>`:''}
+        </div>
+        <div style="font-size:12px;color:#64748b">
+          ${c.channel_type||'email'} campaign &bull;
+          ${c.contact_count||0} contacts &bull;
+          ${c.max_daily_sends||c.daily_limit||10}/day &bull;
+          Review: ${c.review_mode||'manual'}
+          ${c.objective?' &bull; '+esc(c.objective):''}
+        </div>
+      </div>
+    </div>`;
+
+  // Action buttons
+  const s=c.status;
+  let actions='';
+  if(['draft','ready','validation_failed'].includes(s))
+    actions+=`<button class="btn-sm btn-success" onclick="campAction('activate')">Activate</button>`;
+  if(['active','running'].includes(s))
+    actions+=`<button class="btn-sm btn-primary" onclick="campRunNow()">▶ Run Now</button>
+              <button class="btn-sm btn-outline" onclick="campAction('pause')">Pause</button>`;
+  if(s==='paused')
+    actions+=`<button class="btn-sm btn-success" onclick="campAction('resume')">Resume</button>`;
+  if(['draft','ready','active','paused'].includes(s))
+    actions+=`<button class="btn-sm btn-outline" onclick="campValidate()">Validate</button>
+              <button class="btn-sm btn-outline" onclick="showScheduleModal()">Schedule</button>`;
+  if(s!=='archived')
+    actions+=`<button class="btn-sm btn-danger-outline" onclick="campAction('archive')">Archive</button>`;
+  document.getElementById('camp-detail-actions').innerHTML=actions;
+}
+
+function campTab(tab){
+  _currentCampTab=tab;
+  document.querySelectorAll('.camp-tab').forEach((t,i)=>{
+    const tabs=['overview','analytics','sequence','runs','exclusions','settings'];
+    t.classList.toggle('active',tabs[i]===tab);
+  });
+  document.querySelectorAll('.camp-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('camp-tab-'+tab).classList.add('active');
+  if(!_currentCamp) return;
+  const id=_currentCamp.id;
+  if(tab==='overview') loadCampOverview(id);
+  else if(tab==='analytics') loadCampAnalytics(id);
+  else if(tab==='sequence') loadCampSequence(id);
+  else if(tab==='runs') loadCampRuns(id);
+  else if(tab==='exclusions') loadCampExclusions(id);
+  else if(tab==='settings') loadCampSettings();
+}
+
+// ── OVERVIEW TAB ─────────────────────────────────────────────────────────
+
+async function loadCampOverview(id){
+  const el=document.getElementById('camp-tab-overview');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    const [c, pf, preview] = await Promise.all([
+      Promise.resolve(_currentCamp),
+      apiFetch('/campaigns/'+id+'/preflight').catch(()=>null),
+      apiFetch('/campaigns/'+id+'/preview/recipients?limit=5').catch(()=>({data:[]}))
+    ]);
+    const cc=c.contact_counts||{};
+    const tot=Math.max(cc.total||1,1);
+    el.innerHTML=`
+      <!-- KPI row -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        ${campKpi('Contacts',cc.total||0)}
+        ${campKpi('Sent',c.sent_count||0)}
+        ${campKpi('Pending Drafts',c.pending_drafts||0,'#d97706')}
+        ${campKpi('Queued Jobs',c.queued_jobs||0)}
+      </div>
+      <!-- Funnel -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><span class="card-head-title">Contact Funnel</span></div>
+        <div class="card-body">
+          <div class="funnel">
+            ${funnelRow('Total',cc.total||0,cc.total||0,'#2563eb')}
+            ${funnelRow('Pending',cc.pending||0,cc.total||0,'#64748b')}
+            ${funnelRow('Sent',cc.sent||0,cc.total||0,'#2563eb')}
+            ${funnelRow('Opened',cc.opened||0,cc.total||0,'#16a34a')}
+            ${funnelRow('Replied',cc.replied||0,cc.total||0,'#059669')}
+            ${funnelRow('Bounced',cc.bounced||0,cc.total||0,'#dc2626')}
+            ${funnelRow('Unsubscribed',cc.unsubscribed||0,cc.total||0,'#94a3b8')}
+          </div>
+        </div>
+      </div>
+      <!-- Run controls -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><span class="card-head-title">Run Controls</span></div>
+        <div class="card-body">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <button class="btn-sm btn-primary" onclick="campRunNow()">▶ Run All Stages</button>
+            <button class="btn-sm btn-outline" onclick="campRunStage('generate')">Generate Drafts</button>
+            <button class="btn-sm btn-outline" onclick="campRunStage('send')">Send Approved</button>
+            <button class="btn-sm btn-outline" onclick="campRunStage('enrichment')">Enrich Contacts</button>
+            <button class="btn-sm btn-outline" onclick="campDryRun()">🔍 Dry Run</button>
+            <button class="btn-sm btn-outline" onclick="campBulkApprove()">✓ Approve Safe Drafts</button>
+            <button class="btn-sm btn-outline" onclick="campRequeue()">↺ Requeue Failed</button>
+          </div>
+          ${c.last_run_at?`<div style="font-size:12px;color:#64748b">Last run: ${fmt(c.last_run_at)} &bull; Status: ${esc(c.last_run_status||'—')}</div>`:'<div style="font-size:12px;color:#94a3b8">No runs yet.</div>'}
+        </div>
+      </div>
+      <!-- Preflight status -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <span class="card-head-title">Preflight Validation</span>
+          <button class="btn-sm btn-outline" onclick="campValidate()">Run Now</button>
+        </div>
+        <div class="card-body">
+          ${pf&&pf.status!=='unchecked'?renderPreflight(pf):'<div class="alert alert-info">No validation run yet. Click "Run Now" to validate this campaign.</div>'}
+        </div>
+      </div>
+      <!-- Preview recipients -->
+      ${preview.data&&preview.data.length?`
+      <div class="card">
+        <div class="card-head"><span class="card-head-title">Next Recipients Preview</span></div>
+        <div>${preview.data.map(r=>`<div class="row-item"><div>
+          <div class="row-name">${esc((r.first_name||'')+' '+(r.last_name||''))}</div>
+          <div class="row-sub">${esc(r.email||'')} &bull; ${esc(r.company_name||'')}</div>
+        </div></div>`).join('')}</div>
+      </div>`:''}
+    `;
+  }catch(e){el.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+function campKpi(label,val,color){
+  return `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-value" style="${color?'color:'+color:''}">${val}</div></div>`;
+}
+
+function funnelRow(label,val,total,color){
+  const pct=total>0?Math.round((val/total)*100):0;
+  return `<div class="funnel-row">
+    <div class="funnel-label">${label}</div>
+    <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${pct}%;background:${color}"></div></div>
+    <div class="funnel-val">${val.toLocaleString()}</div>
+  </div>`;
+}
+
+function renderPreflight(pf){
+  if(!pf||!pf.results) return '<div class="alert alert-info">No results.</div>';
+  const results=Array.isArray(pf.results)?pf.results:[];
+  const statusColor={pass:'#16a34a',fail:'#dc2626',warn:'#d97706',unchecked:'#64748b'};
+  return `<div style="margin-bottom:10px;display:flex;align-items:center;gap:10px">
+    <div style="font-size:24px;font-weight:700;color:${statusColor[pf.status]||'#64748b'}">${pf.score||0}</div>
+    <div><div style="font-weight:600;color:${statusColor[pf.status]||'#64748b'}">${(pf.status||'unchecked').toUpperCase()}</div>
+    <div style="font-size:12px;color:#94a3b8">${pf.blocking_count||0} blocking &bull; ${pf.warning_count||0} warnings</div></div>
+  </div>
+  <div>${results.map(r=>`<div class="check-row">
+    <div class="check-dot ${r.passed?'pass':(r.severity==='warning'?'warn':r.severity==='info'?'info':'fail')}"></div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:500;color:#0f172a">${esc(r.label)}</div>
+      ${!r.passed&&r.message?'<div style="font-size:12px;color:#dc2626">'+esc(r.message)+'</div>':''}
+    </div>
+    <div style="font-size:11px;color:#94a3b8;flex-shrink:0">${r.passed?'✓':esc(r.severity)}</div>
+  </div>`).join('')}</div>`;
+}
+
+// ── ANALYTICS TAB ────────────────────────────────────────────────────────
+
+async function loadCampAnalytics(id){
+  const el=document.getElementById('camp-tab-analytics');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    const a=await apiFetch('/campaigns/'+id+'/analytics');
+    const s=a||{};
+    el.innerHTML=`
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        ${campKpi('Total Sent',s.total_sent||0)}
+        ${campKpi('Open Rate',(s.open_rate||0)+'%','#2563eb')}
+        ${campKpi('Click Rate',(s.click_rate||0)+'%','#16a34a')}
+        ${campKpi('Reply Rate',(s.reply_rate||0)+'%','#059669')}
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        ${campKpi('Opens',s.opened||0)}
+        ${campKpi('Clicks',s.clicked||0)}
+        ${campKpi('Replies',s.replied||0)}
+        ${campKpi('Bounces',s.bounced||0,'#dc2626')}
+      </div>
+      ${(s.sequence_funnel&&s.sequence_funnel.length)?`
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><span class="card-head-title">Sequence Step Performance</span></div>
+        <div style="overflow-x:auto"><table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid #e2e8f0">
+            <th style="padding:8px 12px;text-align:left;color:#64748b">Step</th>
+            <th style="padding:8px 12px;text-align:right;color:#64748b">Sent</th>
+            <th style="padding:8px 12px;text-align:right;color:#64748b">Opened</th>
+            <th style="padding:8px 12px;text-align:right;color:#64748b">Clicked</th>
+            <th style="padding:8px 12px;text-align:right;color:#64748b">Replied</th>
+          </tr></thead>
+          <tbody>${(s.sequence_funnel||[]).map(st=>`<tr style="border-bottom:1px solid #f8fafc">
+            <td style="padding:8px 12px">Step ${st.step_number||'?'}</td>
+            <td style="padding:8px 12px;text-align:right">${(st.stats&&st.stats.sent)||0}</td>
+            <td style="padding:8px 12px;text-align:right">${(st.stats&&st.stats.opened)||0}</td>
+            <td style="padding:8px 12px;text-align:right">${(st.stats&&st.stats.clicked)||0}</td>
+            <td style="padding:8px 12px;text-align:right">${(st.stats&&st.stats.replied)||0}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`:''}
+      ${(s.trend&&s.trend.length)?`
+      <div class="card">
+        <div class="card-head"><span class="card-head-title">Daily Trend (last ${s.trend.length} days)</span></div>
+        <div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid #e2e8f0">
+            <th style="padding:6px 10px;text-align:left;color:#64748b">Date</th>
+            <th style="padding:6px 10px;text-align:right;color:#64748b">Contacts</th>
+            <th style="padding:6px 10px;text-align:right;color:#64748b">Sent</th>
+            <th style="padding:6px 10px;text-align:right;color:#64748b">Opened</th>
+            <th style="padding:6px 10px;text-align:right;color:#64748b">Replied</th>
+          </tr></thead>
+          <tbody>${s.trend.map(t=>`<tr style="border-bottom:1px solid #f8fafc">
+            <td style="padding:6px 10px">${esc(t.snapshot_date||'')}</td>
+            <td style="padding:6px 10px;text-align:right">${t.contacts_total||0}</td>
+            <td style="padding:6px 10px;text-align:right">${t.contacts_sent||0}</td>
+            <td style="padding:6px 10px;text-align:right">${t.contacts_opened||0}</td>
+            <td style="padding:6px 10px;text-align:right">${t.contacts_replied||0}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`:'<div class="alert alert-info">No trend data yet. Snapshots are taken after each run.</div>'}
+    `;
+  }catch(e){el.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── SEQUENCE TAB ─────────────────────────────────────────────────────────
+
+async function loadCampSequence(id){
+  const el=document.getElementById('camp-tab-sequence');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    const seq=await apiFetch('/campaigns/'+id+'/sequence');
+    if(!seq||!seq.id){
+      el.innerHTML=`<div class="alert alert-info">No sequence linked. Create a sequence and link it to this campaign.</div>
+        <button class="btn-sm btn-primary" onclick="showCreateSequenceModal('${esc(id)}')">+ Create Sequence</button>`;
+      return;
+    }
+    const steps=seq.steps||[];
+    el.innerHTML=`
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <span class="card-head-title">${esc(seq.name)}</span>
+          <span class="badge ${badgeClass(seq.status)}">${esc(seq.status)}</span>
+        </div>
+        <div class="card-body">
+          ${steps.length?steps.map((st,i)=>`
+            <div class="step-card">
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div class="step-num">${st.step_number||i+1}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:4px">
+                    Step ${st.step_number||i+1}
+                    ${i>0?`<span style="color:#94a3b8;font-weight:400"> — after ${st.delay_days||0}d ${st.delay_hours||0}h</span>`:'<span style="color:#94a3b8;font-weight:400"> — Day 0</span>'}
+                  </div>
+                  ${st.subject_template?`<div style="font-size:12px;color:#374151;margin-bottom:3px"><strong>Subject:</strong> ${esc(st.subject_template)}</div>`:''}
+                  ${st.tone?`<div style="font-size:12px;color:#64748b">Tone: ${esc(st.tone)}</div>`:''}
+                  <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                    ${st.stop_on_reply?'<span class="badge b-default">stop-on-reply</span>':''}
+                    ${st.business_days_only?'<span class="badge b-default">biz-days</span>':''}
+                    ${st.send_window_start!=null?`<span class="badge b-default">window ${st.send_window_start}h–${st.send_window_end}h</span>`:''}
+                  </div>
+                </div>
+                <div style="display:flex;gap:4px;flex-shrink:0">
+                  <button class="btn-sm btn-outline" onclick="editSequenceStep('${esc(seq.id)}','${esc(st.id)}',${st.step_number})">Edit</button>
+                </div>
+              </div>
+            </div>
+          `).join(''):'<div class="empty">No steps yet.</div>'}
+          <button class="btn-sm btn-primary" style="margin-top:8px" onclick="addSequenceStep('${esc(seq.id)}',${steps.length})">+ Add Step</button>
+        </div>
+      </div>
+    `;
+  }catch(e){el.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── RUNS TAB ─────────────────────────────────────────────────────────────
+
+async function loadCampRuns(id){
+  const el=document.getElementById('camp-tab-runs');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    const d=await apiFetch('/campaigns/'+id+'/runs?limit=30');
+    const runs=d.data||[];
+    if(!runs.length){el.innerHTML='<div class="empty">No runs yet.</div>';return;}
+    el.innerHTML=`<div class="card"><div>${runs.map(r=>`
+      <div class="run-row">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:500;color:#0f172a">${esc(r.run_type)} — ${esc(r.stage||'all')}</div>
+          <div style="font-size:12px;color:#94a3b8">
+            ${fmt(r.created_at)}
+            ${r.triggered_by_email?' &bull; by '+esc(r.triggered_by_email):''}
+            ${r.contacts_processed?' &bull; '+r.contacts_processed+' processed':''}
+            ${r.drafts_generated?' &bull; '+r.drafts_generated+' drafted':''}
+            ${r.emails_queued?' &bull; '+r.emails_queued+' queued':''}
+          </div>
+          ${r.error_message?'<div style="font-size:11px;color:#dc2626">'+esc(r.error_message.substring(0,100))+'</div>':''}
+        </div>
+        <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span>
+      </div>`).join('')}</div></div>`;
+  }catch(e){el.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── EXCLUSIONS TAB ───────────────────────────────────────────────────────
+
+async function loadCampExclusions(id){
+  const el=document.getElementById('camp-tab-exclusions');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    const d=await apiFetch('/campaigns/'+id+'/exclusions');
+    const rows=d.data||[];
+    el.innerHTML=`
+      <div style="margin-bottom:12px">
+        <button class="btn-sm btn-primary" onclick="showAddCampExclusion('${esc(id)}')">+ Add Exclusion</button>
+      </div>
+      ${rows.length?`<div class="card"><div>${rows.map(r=>`
+        <div class="row-item">
+          <div><div class="row-name">${esc(r.email||('@'+r.domain))}</div>
+          <div class="row-sub">${esc(r.reason||'manual')} &bull; ${fmt(r.created_at)}</div></div>
+          <button class="btn-sm btn-danger-outline" onclick="removeCampExclusion('${esc(id)}','${esc(r.id)}')">Remove</button>
+        </div>`).join('')}</div></div>`
+        :'<div class="empty">No campaign-specific exclusions.</div>'}
+    `;
+  }catch(e){el.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+async function showAddCampExclusion(campId){
   document.getElementById('modal-body').innerHTML=`
-    <div class="modal-title">New Campaign</div>
+    <div class="modal-title">Add Exclusion</div>
     <div class="form-stack">
-      <div id="camp-alert"></div>
-      <div class="field"><label>Name</label><input id="camp-name" placeholder="e.g. Houston Healthcare Q2"></div>
-      <div class="field"><label>Description</label><textarea id="camp-desc" placeholder="Campaign description..."></textarea></div>
-      <div class="field"><label>Daily email limit</label><input id="camp-limit" type="number" value="10" min="1" max="100"></div>
+      <div id="excl-alert"></div>
+      <div class="field"><label>Email or Domain</label><input id="excl-val" placeholder="user@example.com or example.com"></div>
+      <div class="field"><label>Reason</label><select id="excl-reason">
+        <option value="manual">Manual</option>
+        <option value="competitor">Competitor</option>
+        <option value="do_not_contact">Do Not Contact</option>
+      </select></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="createCampaign()">Create</button>
+      <button class="btn btn-primary" onclick="addCampExclusion('${esc(campId)}')">Add</button>
     </div>`;
   document.getElementById('overlay').style.display='flex';
 }
 
-async function createCampaign(){
-  const name=document.getElementById('camp-name').value.trim();
-  if(!name){document.getElementById('camp-alert').innerHTML='<div class="alert alert-error">Name required</div>';return;}
+async function addCampExclusion(campId){
+  const val=document.getElementById('excl-val').value.trim();
+  const reason=document.getElementById('excl-reason').value;
+  if(!val){document.getElementById('excl-alert').innerHTML='<div class="alert alert-error">Value required</div>';return;}
   try{
-    await apiFetch('/campaigns',{method:'POST',body:JSON.stringify({name,description:document.getElementById('camp-desc').value,daily_limit:parseInt(document.getElementById('camp-limit').value)||10})});
-    closeModal(); loadCampaigns(); showToast('Campaign created!');
-  }catch(e){document.getElementById('camp-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+    const body=val.includes('@')&&!val.startsWith('@')?{email:val,reason}:{domain:val.replace(/^@/,''),reason};
+    await apiFetch('/campaigns/'+campId+'/exclusions',{method:'POST',body:JSON.stringify(body)});
+    closeModal(); loadCampExclusions(campId); showToast('Exclusion added');
+  }catch(e){document.getElementById('excl-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
 }
 
-async function showCampaignDetail(id){
+async function removeCampExclusion(campId,exclId){
+  if(!confirm('Remove exclusion?')) return;
   try{
-    const [c,stats]=await Promise.all([apiFetch('/campaigns/'+id),apiFetch('/analytics/campaigns/'+id).catch(()=>null)]);
-    const s=stats||{};
-    document.getElementById('modal-body').innerHTML=`
-      <div class="modal-title">${esc(c.name)}</div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-val">${s.total_sent||0}</div><div class="stat-lbl">Sent</div></div>
-        <div class="stat-box"><div class="stat-val">${s.open_rate||0}%</div><div class="stat-lbl">Opens</div></div>
-        <div class="stat-box"><div class="stat-val">${s.reply_rate||0}%</div><div class="stat-lbl">Replies</div></div>
-      </div>
-      <div style="font-size:13px;color:#64748b;display:flex;flex-direction:column;gap:6px">
-        <div><strong>Status:</strong> <span class="badge ${badgeClass(c.status)}">${esc(c.status)}</span></div>
-        <div><strong>Daily limit:</strong> ${c.daily_limit} emails</div>
-        <div><strong>Contacts:</strong> ${c.contact_count||0}</div>
-        ${c.description?'<div><strong>Description:</strong> '+esc(c.description)+'</div>':''}
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-        ${c.status==='draft'?'<button class="btn btn-success" onclick="setCampaignStatus(\''+id+'\',\'active\')">Activate</button>':''}
-        ${c.status==='active'?'<button class="btn btn-secondary" onclick="setCampaignStatus(\''+id+'\',\'paused\')">Pause</button>':''}
-        ${c.status==='paused'?'<button class="btn btn-success" onclick="setCampaignStatus(\''+id+'\',\'active\')">Resume</button>':''}
-        <button class="btn btn-danger-outline" onclick="setCampaignStatus('${id}','archived')">Archive</button>
-      </div>`;
-    document.getElementById('overlay').style.display='flex';
+    await apiFetch('/campaigns/'+campId+'/exclusions/'+exclId,{method:'DELETE'});
+    showToast('Exclusion removed'); loadCampExclusions(campId);
   }catch(e){alert('Error: '+e.message);}
 }
 
+// ── SETTINGS TAB ─────────────────────────────────────────────────────────
+
+function loadCampSettings(){
+  const c=_currentCamp;
+  if(!c) return;
+  const el=document.getElementById('camp-tab-settings');
+  let icp={},sender={};
+  try{icp=typeof c.icp_config==='object'?c.icp_config:JSON.parse(c.icp_config||'{}')}catch(_){}
+  try{sender=typeof c.sender_config==='object'?c.sender_config:JSON.parse(c.sender_config||'{}')}catch(_){}
+  el.innerHTML=`
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-head"><span class="card-head-title">Campaign Settings</span>
+        <button class="btn-sm btn-primary" onclick="saveCampSettings()">Save</button></div>
+      <div class="card-body">
+        <div class="form-stack">
+          <div class="field"><label>Name</label><input id="cs-name" value="${esc(c.name)}"></div>
+          <div class="field"><label>Objective</label><input id="cs-objective" value="${esc(c.objective||'')}"></div>
+          <div class="field"><label>Description</label><textarea id="cs-description">${esc(c.description||'')}</textarea></div>
+          <div class="field"><label>Priority</label><select id="cs-priority">
+            <option value="low" ${c.priority==='low'?'selected':''}>Low</option>
+            <option value="normal" ${(!c.priority||c.priority==='normal')?'selected':''}>Normal</option>
+            <option value="high" ${c.priority==='high'?'selected':''}>High</option>
+            <option value="urgent" ${c.priority==='urgent'?'selected':''}>Urgent</option>
+          </select></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="field"><label>Max Daily Sends</label><input id="cs-daily" type="number" value="${c.max_daily_sends||c.daily_limit||10}" min="1" max="500"></div>
+            <div class="field"><label>Max Hourly Sends</label><input id="cs-hourly" type="number" value="${c.max_hourly_sends||5}" min="1" max="100"></div>
+          </div>
+          <div class="field"><label>Review Mode</label><select id="cs-review">
+            <option value="manual" ${c.review_mode==='manual'?'selected':''}>Manual (operator approves each draft)</option>
+            <option value="auto" ${c.review_mode==='auto'?'selected':''}>Auto-Send (no review required)</option>
+          </select></div>
+          <div class="field"><label>Timezone</label><select id="cs-tz">
+            <option value="America/Chicago" ${(c.timezone||'America/Chicago')==='America/Chicago'?'selected':''}>Central (Chicago)</option>
+            <option value="America/New_York" ${c.timezone==='America/New_York'?'selected':''}>Eastern (New York)</option>
+            <option value="America/Denver" ${c.timezone==='America/Denver'?'selected':''}>Mountain (Denver)</option>
+            <option value="America/Los_Angeles" ${c.timezone==='America/Los_Angeles'?'selected':''}>Pacific (LA)</option>
+            <option value="UTC" ${c.timezone==='UTC'?'selected':''}>UTC</option>
+          </select></div>
+          <div class="field"><label>Reply-To Email</label><input id="cs-replyto" value="${esc(c.reply_to_email||'')}"></div>
+          <div class="field"><label>Internal Notes</label><textarea id="cs-notes">${esc(c.notes||'')}</textarea></div>
+          <div id="cs-alert"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-head"><span class="card-head-title">ICP / Audience Config</span></div>
+      <div class="card-body">
+        <div class="form-stack">
+          <div class="field"><label>Industries (comma-separated)</label>
+            <input id="cs-industries" value="${esc((icp.industries||[]).join(', '))}"></div>
+          <div class="field"><label>Locations</label>
+            <input id="cs-locations" value="${esc((icp.locations||[]).join(', '))}"></div>
+          <div class="field"><label>Target Titles</label>
+            <input id="cs-titles" value="${esc((icp.titles||[]).join(', '))}"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="field"><label>Employee Min</label>
+              <input id="cs-emp-min" type="number" value="${icp.employee_min||25}"></div>
+            <div class="field"><label>Employee Max</label>
+              <input id="cs-emp-max" type="number" value="${icp.employee_max||200}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-head-title">Danger Zone</span></div>
+      <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-sm btn-danger-outline" onclick="campAction('archive')">Archive Campaign</button>
+        <button class="btn-sm btn-outline" onclick="cloneCampaign('${esc(c.id)}')">Clone Campaign</button>
+        ${c.status==='archived'?`<button class="btn-sm btn-outline" onclick="campUnarchive()">Unarchive</button>`:''}
+      </div>
+    </div>
+  `;
+}
+
+async function saveCampSettings(){
+  const c=_currentCamp;
+  if(!c) return;
+  const icp={
+    industries:document.getElementById('cs-industries').value.split(',').map(s=>s.trim()).filter(Boolean),
+    locations:document.getElementById('cs-locations').value.split(',').map(s=>s.trim()).filter(Boolean),
+    titles:document.getElementById('cs-titles').value.split(',').map(s=>s.trim()).filter(Boolean),
+    employee_min:parseInt(document.getElementById('cs-emp-min').value)||25,
+    employee_max:parseInt(document.getElementById('cs-emp-max').value)||200,
+  };
+  const data={
+    name:document.getElementById('cs-name').value.trim(),
+    objective:document.getElementById('cs-objective').value.trim(),
+    description:document.getElementById('cs-description').value.trim(),
+    priority:document.getElementById('cs-priority').value,
+    max_daily_sends:parseInt(document.getElementById('cs-daily').value)||10,
+    daily_limit:parseInt(document.getElementById('cs-daily').value)||10,
+    max_hourly_sends:parseInt(document.getElementById('cs-hourly').value)||5,
+    review_mode:document.getElementById('cs-review').value,
+    timezone:document.getElementById('cs-tz').value,
+    reply_to_email:document.getElementById('cs-replyto').value.trim()||null,
+    notes:document.getElementById('cs-notes').value.trim()||null,
+    icp_config:icp,
+  };
+  try{
+    _currentCamp=await apiFetch('/campaigns/'+c.id,{method:'PUT',body:JSON.stringify(data)});
+    renderCampDetailHeader(_currentCamp);
+    showToast('Settings saved');
+    document.getElementById('cs-alert').innerHTML='<div class="alert alert-success">Saved.</div>';
+    setTimeout(()=>{const a=document.getElementById('cs-alert');if(a)a.innerHTML='';},2000);
+  }catch(e){document.getElementById('cs-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── ACTION HELPERS ────────────────────────────────────────────────────────
+
+async function campAction(action){
+  if(!_currentCamp) return;
+  const id=_currentCamp.id;
+  const confirmMap={archive:'Archive this campaign?'};
+  if(confirmMap[action]&&!confirm(confirmMap[action])) return;
+  try{
+    let c;
+    if(action==='activate') c=await apiFetch('/campaigns/'+id+'/activate',{method:'POST',body:'{}'});
+    else if(action==='pause') c=await apiFetch('/campaigns/'+id+'/pause',{method:'POST',body:'{}'});
+    else if(action==='resume') c=await apiFetch('/campaigns/'+id+'/resume',{method:'POST',body:'{}'});
+    else if(action==='archive'){await apiFetch('/campaigns/'+id,{method:'DELETE'});closeCampDetail();return;}
+    if(c){_currentCamp=c;renderCampDetailHeader(c);}
+    showToast('Campaign '+action+'d');
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function campUnarchive(){
+  if(!_currentCamp) return;
+  try{
+    _currentCamp=await apiFetch('/campaigns/'+_currentCamp.id+'/unarchive',{method:'POST',body:'{}'});
+    renderCampDetailHeader(_currentCamp); showToast('Campaign unarchived');
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function campRunNow(){
+  if(!_currentCamp) return;
+  if(!confirm('Run all pipeline stages for this campaign now?')) return;
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/run',{method:'POST',body:JSON.stringify({})});
+    showToast('Run started: '+r.id); campTab('runs');
+  }catch(e){alert('Run failed: '+e.message);}
+}
+
+async function campRunStage(stage){
+  if(!_currentCamp) return;
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/run/stage',{method:'POST',body:JSON.stringify({stage})});
+    showToast('Stage "'+stage+'" queued: run '+r.id); campTab('runs');
+  }catch(e){alert('Stage run failed: '+e.message);}
+}
+
+async function campDryRun(){
+  if(!_currentCamp) return;
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/dry-run',{method:'POST',body:'{}'});
+    showToast('Dry run created: '+r.id); campTab('runs');
+  }catch(e){alert('Dry run failed: '+e.message);}
+}
+
+async function campBulkApprove(){
+  if(!_currentCamp) return;
+  if(!confirm('Approve all pending drafts with spam score ≤ 5?')) return;
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/approve-all-drafts',{method:'POST',body:'{}'});
+    showToast(r.message||'Drafts approved');
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function campRequeue(){
+  if(!_currentCamp) return;
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/requeue-failed',{method:'POST',body:'{}'});
+    showToast(r.message||'Jobs requeued');
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function campValidate(){
+  if(!_currentCamp) return;
+  showToast('Running preflight validation…');
+  try{
+    const r=await apiFetch('/campaigns/'+_currentCamp.id+'/validate',{method:'POST',body:'{}'});
+    _currentCamp.preflight_status=r.status;
+    _currentCamp.preflight_score=r.score;
+    renderCampDetailHeader(_currentCamp);
+    campTab('overview');
+    showToast('Preflight: '+r.status+' (score '+r.score+')');
+  }catch(e){alert('Validation failed: '+e.message);}
+}
+
+// ── SCHEDULE MODAL ────────────────────────────────────────────────────────
+
+function showScheduleModal(){
+  if(!_currentCamp) return;
+  const c=_currentCamp;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">Schedule Campaign</div>
+    <div class="form-stack">
+      <div id="sched-alert"></div>
+      <div class="field"><label>Schedule Mode</label><select id="sched-mode" onchange="updateSchedFields()">
+        <option value="manual" ${(c.schedule_mode||'manual')==='manual'?'selected':''}>Manual Only</option>
+        <option value="once" ${c.schedule_mode==='once'?'selected':''}>Run Once at Date/Time</option>
+        <option value="recurring" ${c.schedule_mode==='recurring'?'selected':''}>Recurring Daily</option>
+      </select></div>
+      <div id="sched-datetime-wrap" class="field" style="display:none">
+        <label>Start Date/Time (local)</label>
+        <input type="datetime-local" id="sched-at" value="${c.scheduled_at?c.scheduled_at.slice(0,16):''}">
+      </div>
+      <div class="field"><label>Timezone</label><select id="sched-tz">
+        <option value="America/Chicago" ${(c.timezone||'America/Chicago')==='America/Chicago'?'selected':''}>Central (Chicago)</option>
+        <option value="America/New_York" ${c.timezone==='America/New_York'?'selected':''}>Eastern (New York)</option>
+        <option value="America/Denver" ${c.timezone==='America/Denver'?'selected':''}>Mountain (Denver)</option>
+        <option value="America/Los_Angeles" ${c.timezone==='America/Los_Angeles'?'selected':''}>Pacific (LA)</option>
+        <option value="UTC" ${c.timezone==='UTC'?'selected':''}>UTC</option>
+      </select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      ${c.scheduled_at?'<button class="btn btn-outline" onclick="campUnschedule()">Unschedule</button>':''}
+      <button class="btn btn-primary" onclick="saveCampSchedule()">Save Schedule</button>
+    </div>`;
+  document.getElementById('overlay').style.display='flex';
+  updateSchedFields();
+}
+
+function updateSchedFields(){
+  const mode=document.getElementById('sched-mode').value;
+  document.getElementById('sched-datetime-wrap').style.display=(mode!=='manual')?'block':'none';
+}
+
+async function saveCampSchedule(){
+  const mode=document.getElementById('sched-mode').value;
+  const tz=document.getElementById('sched-tz').value;
+  if(mode==='manual'){
+    try{
+      _currentCamp=await apiFetch('/campaigns/'+_currentCamp.id,{method:'PUT',body:JSON.stringify({schedule_mode:'manual',scheduled_at:null})});
+      renderCampDetailHeader(_currentCamp); closeModal(); showToast('Set to manual mode');
+    }catch(e){document.getElementById('sched-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+    return;
+  }
+  const at=document.getElementById('sched-at').value;
+  if(!at){document.getElementById('sched-alert').innerHTML='<div class="alert alert-error">Date/time required</div>';return;}
+  try{
+    _currentCamp=await apiFetch('/campaigns/'+_currentCamp.id+'/schedule',{method:'POST',
+      body:JSON.stringify({scheduled_at:new Date(at).toISOString(),schedule_mode:mode,timezone:tz})});
+    renderCampDetailHeader(_currentCamp); closeModal(); showToast('Campaign scheduled');
+  }catch(e){document.getElementById('sched-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+async function campUnschedule(){
+  try{
+    _currentCamp=await apiFetch('/campaigns/'+_currentCamp.id+'/unschedule',{method:'POST',body:'{}'});
+    renderCampDetailHeader(_currentCamp); closeModal(); showToast('Campaign unscheduled');
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// ── CAMPAIGN BUILDER ──────────────────────────────────────────────────────
+
+let _builderTab='basics';
+
+function showCampBuilder(prefillData){
+  const d=prefillData||{};
+  document.getElementById('modal-body').className='modal modal-wide';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">${d.id?'Edit Campaign':'New Campaign'}</div>
+    <div class="builder-tabs">
+      <button class="builder-tab active" onclick="builderTab('basics')">Basics</button>
+      <button class="builder-tab" onclick="builderTab('audience')">Audience</button>
+      <button class="builder-tab" onclick="builderTab('sender')">Sender</button>
+      <button class="builder-tab" onclick="builderTab('schedule')">Schedule</button>
+      <button class="builder-tab" onclick="builderTab('compliance')">Compliance</button>
+    </div>
+    <div id="builder-alert"></div>
+    <!-- Basics -->
+    <div id="bp-basics" class="builder-panel active">
+      <div class="form-stack">
+        <div class="field"><label>Campaign Name *</label><input id="b-name" placeholder="e.g. Houston Healthcare Q2 2026" value="${esc(d.name||'')}"></div>
+        <div class="field"><label>Objective</label><input id="b-objective" placeholder="e.g. Book demo meetings with office managers" value="${esc(d.objective||'')}"></div>
+        <div class="field"><label>Description</label><textarea id="b-desc" placeholder="Internal description...">${esc(d.description||'')}</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Priority</label><select id="b-priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select></div>
+          <div class="field"><label>Channel</label><select id="b-channel">
+            <option value="email" selected>Email</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Internal Notes</label><textarea id="b-notes" placeholder="Notes for your team...">${esc(d.notes||'')}</textarea></div>
+      </div>
+    </div>
+    <!-- Audience -->
+    <div id="bp-audience" class="builder-panel">
+      <div class="form-stack">
+        <div class="field"><label>Industries (comma-separated)</label>
+          <input id="b-industries" placeholder="Healthcare, Law Practice, Accounting" value="${esc(d.industries||'Healthcare, Law Practice, Accounting')}"></div>
+        <div class="field"><label>Locations</label>
+          <input id="b-locations" placeholder="Houston, Texas" value="${esc(d.locations||'Houston, Texas')}"></div>
+        <div class="field"><label>Target Job Titles</label>
+          <input id="b-titles" placeholder="Office Manager, Practice Administrator, Managing Partner" value="${esc(d.titles||'Office Manager, Practice Administrator')}"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Employee Min</label><input id="b-emp-min" type="number" value="${d.employee_min||25}"></div>
+          <div class="field"><label>Employee Max</label><input id="b-emp-max" type="number" value="${d.employee_max||200}"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Sender -->
+    <div id="bp-sender" class="builder-panel">
+      <div class="form-stack">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Max Daily Sends</label><input id="b-daily" type="number" value="${d.max_daily_sends||10}" min="1" max="500"></div>
+          <div class="field"><label>Max Hourly Sends</label><input id="b-hourly" type="number" value="${d.max_hourly_sends||5}" min="1" max="100"></div>
+        </div>
+        <div class="field"><label>Review Mode</label><select id="b-review">
+          <option value="manual" selected>Manual — operator approves each draft</option>
+          <option value="auto">Auto-Send — no review required</option>
+        </select></div>
+        <div class="field"><label>Reply-To Email (optional)</label>
+          <input id="b-replyto" type="email" placeholder="replies@yourdomain.com"></div>
+        <div class="alert alert-info">SMTP credentials are configured via environment variables (SMTP_USER/SMTP_PASS).</div>
+      </div>
+    </div>
+    <!-- Schedule -->
+    <div id="bp-schedule" class="builder-panel">
+      <div class="form-stack">
+        <div class="field"><label>Schedule Mode</label><select id="b-sched-mode" onchange="builderSchedToggle()">
+          <option value="manual" selected>Manual Only</option>
+          <option value="once">Run Once at Date/Time</option>
+          <option value="recurring">Recurring Daily</option>
+        </select></div>
+        <div id="b-sched-dt-wrap" class="field" style="display:none">
+          <label>Start Date/Time</label><input type="datetime-local" id="b-sched-at">
+        </div>
+        <div class="field"><label>Timezone</label><select id="b-tz">
+          <option value="America/Chicago" selected>Central (Chicago)</option>
+          <option value="America/New_York">Eastern (New York)</option>
+          <option value="America/Denver">Mountain (Denver)</option>
+          <option value="America/Los_Angeles">Pacific (LA)</option>
+          <option value="UTC">UTC</option>
+        </select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Start Date (optional)</label><input type="date" id="b-start-at"></div>
+          <div class="field"><label>End Date (optional)</label><input type="date" id="b-end-at"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Compliance -->
+    <div id="bp-compliance" class="builder-panel">
+      <div class="form-stack">
+        <div class="alert alert-info">Campaign-level compliance settings. Global suppression list is always enforced.</div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="b-unsub" checked style="width:auto;padding:0;border:none">
+            Require unsubscribe footer in all emails
+          </label>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="b-preflight" checked style="width:auto;padding:0;border:none">
+            Require preflight validation before launch
+          </label>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="b-manual-runs" checked style="width:auto;padding:0;border:none">
+            Allow manual runs
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCampBuilder()">Create Campaign</button>
+    </div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+
+function builderTab(tab){
+  _builderTab=tab;
+  document.querySelectorAll('.builder-tab').forEach((t,i)=>{
+    const tabs=['basics','audience','sender','schedule','compliance'];
+    t.classList.toggle('active',tabs[i]===tab);
+  });
+  document.querySelectorAll('.builder-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bp-'+tab).classList.add('active');
+}
+
+function builderSchedToggle(){
+  const mode=document.getElementById('b-sched-mode').value;
+  document.getElementById('b-sched-dt-wrap').style.display=(mode!=='manual')?'block':'none';
+}
+
+async function submitCampBuilder(){
+  const name=document.getElementById('b-name').value.trim();
+  if(!name){
+    builderTab('basics');
+    document.getElementById('builder-alert').innerHTML='<div class="alert alert-error">Campaign name is required</div>';
+    return;
+  }
+  const icp={
+    industries:document.getElementById('b-industries').value.split(',').map(s=>s.trim()).filter(Boolean),
+    locations:document.getElementById('b-locations').value.split(',').map(s=>s.trim()).filter(Boolean),
+    titles:document.getElementById('b-titles').value.split(',').map(s=>s.trim()).filter(Boolean),
+    employee_min:parseInt(document.getElementById('b-emp-min').value)||25,
+    employee_max:parseInt(document.getElementById('b-emp-max').value)||200,
+  };
+  const schedMode=document.getElementById('b-sched-mode').value;
+  const schedAt=schedMode!=='manual'?document.getElementById('b-sched-at').value:null;
+  const complianceCfg={
+    require_unsubscribe_footer:document.getElementById('b-unsub').checked,
+  };
+  const payload={
+    name,
+    objective:document.getElementById('b-objective').value.trim()||null,
+    description:document.getElementById('b-desc').value.trim()||null,
+    priority:document.getElementById('b-priority').value,
+    channel_type:document.getElementById('b-channel').value,
+    notes:document.getElementById('b-notes').value.trim()||null,
+    icp_config:icp,
+    max_daily_sends:parseInt(document.getElementById('b-daily').value)||10,
+    daily_limit:parseInt(document.getElementById('b-daily').value)||10,
+    max_hourly_sends:parseInt(document.getElementById('b-hourly').value)||5,
+    review_mode:document.getElementById('b-review').value,
+    reply_to_email:document.getElementById('b-replyto').value.trim()||null,
+    schedule_mode:schedMode,
+    scheduled_at:schedAt?new Date(schedAt).toISOString():null,
+    timezone:document.getElementById('b-tz').value,
+    start_at:document.getElementById('b-start-at').value?new Date(document.getElementById('b-start-at').value).toISOString():null,
+    end_at:document.getElementById('b-end-at').value?new Date(document.getElementById('b-end-at').value).toISOString():null,
+    require_preflight:document.getElementById('b-preflight').checked,
+    allow_manual_runs:document.getElementById('b-manual-runs').checked,
+    compliance_config:complianceCfg,
+  };
+  try{
+    const c=await apiFetch('/campaigns',{method:'POST',body:JSON.stringify(payload)});
+    closeModal(); showToast('Campaign created: '+c.name);
+    openCampDetail(c.id);
+  }catch(e){document.getElementById('builder-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── SEQUENCE STEP EDITOR ──────────────────────────────────────────────────
+
+async function addSequenceStep(seqId, currentCount){
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">Add Sequence Step</div>
+    <div class="form-stack">
+      <div id="step-alert"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Delay Days</label><input id="step-delay-d" type="number" value="${currentCount>0?3:0}" min="0"></div>
+        <div class="field"><label>Delay Hours</label><input id="step-delay-h" type="number" value="0" min="0" max="23"></div>
+      </div>
+      <div class="field"><label>Subject Template</label>
+        <input id="step-subject" placeholder="e.g. Quick question about {{company_name}}'s IT"></div>
+      <div class="field"><label>Body Template (optional — AI generates if blank)</label>
+        <textarea id="step-body" style="height:120px" placeholder="Dear {{first_name}},\n\n..."></textarea></div>
+      <div class="field"><label>Tone</label><select id="step-tone">
+        <option value="professional">Professional</option>
+        <option value="friendly">Friendly</option>
+        <option value="casual">Casual</option>
+        <option value="direct">Direct</option>
+      </select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Send Window Start (hour)</label><input id="step-win-s" type="number" value="8" min="0" max="23"></div>
+        <div class="field"><label>Send Window End (hour)</label><input id="step-win-e" type="number" value="17" min="1" max="24"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="step-biz" checked style="width:auto;padding:0;border:none">Business days only</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="step-stop-reply" checked style="width:auto;padding:0;border:none">Stop on reply</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="step-stop-unsub" checked style="width:auto;padding:0;border:none">Stop on unsubscribe</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="step-stop-bounce" checked style="width:auto;padding:0;border:none">Stop on bounce</label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSequenceStep('${esc(seqId)}',${currentCount+1},null)">Add Step</button>
+    </div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+
+async function editSequenceStep(seqId, stepId, stepNum){
+  try{
+    // Fetch step details from the sequence
+    const seq=await apiFetch('/sequences/'+seqId);
+    const steps=seq.steps||[];
+    const st=steps.find(s=>s.id===stepId)||{};
+    document.getElementById('modal-body').innerHTML=`
+      <div class="modal-title">Edit Step ${stepNum}</div>
+      <div class="form-stack">
+        <div id="step-alert"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Delay Days</label><input id="step-delay-d" type="number" value="${st.delay_days||0}" min="0"></div>
+          <div class="field"><label>Delay Hours</label><input id="step-delay-h" type="number" value="${st.delay_hours||0}" min="0" max="23"></div>
+        </div>
+        <div class="field"><label>Subject Template</label>
+          <input id="step-subject" value="${esc(st.subject_template||'')}"></div>
+        <div class="field"><label>Body Template</label>
+          <textarea id="step-body" style="height:120px">${esc(st.body_template||'')}</textarea></div>
+        <div class="field"><label>Tone</label><select id="step-tone">
+          <option value="professional" ${(st.tone||'professional')==='professional'?'selected':''}>Professional</option>
+          <option value="friendly" ${st.tone==='friendly'?'selected':''}>Friendly</option>
+          <option value="casual" ${st.tone==='casual'?'selected':''}>Casual</option>
+          <option value="direct" ${st.tone==='direct'?'selected':''}>Direct</option>
+        </select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Window Start</label><input id="step-win-s" type="number" value="${st.send_window_start??8}" min="0" max="23"></div>
+          <div class="field"><label>Window End</label><input id="step-win-e" type="number" value="${st.send_window_end??17}" min="1" max="24"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="step-biz" ${st.business_days_only!==0?'checked':''} style="width:auto;padding:0;border:none">Business days only</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="step-stop-reply" ${st.stop_on_reply!==0?'checked':''} style="width:auto;padding:0;border:none">Stop on reply</label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSequenceStep('${esc(seqId)}',${stepNum},'${esc(stepId)}')">Save Step</button>
+      </div>`;
+    document.getElementById('overlay').style.display='flex';
+  }catch(e){alert('Error loading step: '+e.message);}
+}
+
+async function saveSequenceStep(seqId, stepNum, stepId){
+  const data={
+    step_number:stepNum,
+    delay_days:parseInt(document.getElementById('step-delay-d').value)||0,
+    delay_hours:parseInt(document.getElementById('step-delay-h').value)||0,
+    subject_template:document.getElementById('step-subject').value.trim()||null,
+    body_template:document.getElementById('step-body').value.trim()||null,
+    tone:document.getElementById('step-tone').value,
+    send_window_start:parseInt(document.getElementById('step-win-s').value)||8,
+    send_window_end:parseInt(document.getElementById('step-win-e').value)||17,
+    business_days_only:document.getElementById('step-biz').checked?1:0,
+    stop_on_reply:document.getElementById('step-stop-reply').checked?1:0,
+    stop_on_unsubscribe:document.getElementById('step-stop-unsub')?.checked?1:0,
+    stop_on_bounce:document.getElementById('step-stop-bounce')?.checked?1:0,
+  };
+  try{
+    if(stepId){
+      await apiFetch('/sequences/'+seqId+'/steps/'+stepId,{method:'PUT',body:JSON.stringify(data)});
+    } else {
+      await apiFetch('/sequences/'+seqId+'/steps',{method:'POST',body:JSON.stringify(data)});
+    }
+    closeModal(); showToast('Step saved');
+    if(_currentCamp) loadCampSequence(_currentCamp.id);
+  }catch(e){
+    const a=document.getElementById('step-alert');
+    if(a) a.innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';
+  }
+}
+
+async function showCreateSequenceModal(campId){
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">Create Sequence</div>
+    <div class="form-stack">
+      <div id="seq-alert"></div>
+      <div class="field"><label>Sequence Name</label><input id="seq-name" placeholder="e.g. 3-Touch Cold Outreach"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createSequenceForCamp('${esc(campId)}')">Create</button>
+    </div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+
+async function createSequenceForCamp(campId){
+  const name=document.getElementById('seq-name').value.trim();
+  if(!name){document.getElementById('seq-alert').innerHTML='<div class="alert alert-error">Name required</div>';return;}
+  try{
+    const seq=await apiFetch('/sequences',{method:'POST',body:JSON.stringify({campaign_id:campId,name,status:'active'})});
+    // Link to campaign
+    await apiFetch('/campaigns/'+campId,{method:'PUT',body:JSON.stringify({sequence_id:seq.id})});
+    closeModal(); showToast('Sequence created and linked');
+    if(_currentCamp){_currentCamp.sequence_id=seq.id; loadCampSequence(campId);}
+  }catch(e){document.getElementById('seq-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
+}
+
+// ── LEGACY COMPAT ─────────────────────────────────────────────────────────
+// Keep old setCampaignStatus in case it's called from elsewhere
 async function setCampaignStatus(id, status){
   try{
     await apiFetch('/campaigns/'+id,{method:'PUT',body:JSON.stringify({status})});
-    closeModal(); loadCampaigns(); showToast('Campaign '+status);
+    if(_currentCamp&&_currentCamp.id===id){_currentCamp.status=status;renderCampDetailHeader(_currentCamp);}
+    loadCampaigns(); showToast('Campaign '+status);
   }catch(e){alert('Error: '+e.message);}
 }
+
+function fmtDate(iso){return iso?new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';}
 
 // CONTACTS
 async function loadContacts(){

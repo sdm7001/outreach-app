@@ -57,6 +57,7 @@ const suppressionRouter = require('./src/api/suppression');
 const auditRouter = require('./src/api/audit');
 const trackingRouter = require('./src/api/tracking');
 const adminRouter = require('./src/api/admin');
+const senderProfilesRouter = require('./src/api/sender-profiles');
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/campaigns', campaignsRouter);
@@ -68,6 +69,7 @@ app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/suppression', suppressionRouter);
 app.use('/api/v1/audit', auditRouter);
 app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/sender-profiles', senderProfilesRouter);
 
 // Tracking endpoints (public, no auth required)
 app.use('/t', trackingRouter);
