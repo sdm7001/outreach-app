@@ -64,10 +64,14 @@ async function searchProspects(query, userId) {
         if (maskedCount > 0) {
           warnings.push(`${maskedCount} Apollo result(s) have masked emails — upgrade your Apollo plan or enrich manually to unlock them`);
         }
+        if (apolloResults.length === 0) {
+          warnings.push('Apollo returned 0 results — try broader search criteria (fewer filters or different keywords)');
+        }
       } catch (apolloErr) {
         const msg = apolloErr.response?.data?.message || apolloErr.response?.data?.error || apolloErr.message;
-        warnings.push(`Apollo search failed: ${msg}`);
-        logger.warn('Apollo search error', { searchId, error: msg });
+        const status = apolloErr.response?.status;
+        warnings.push(`Apollo search failed (${status || 'network error'}): ${msg}`);
+        logger.warn('Apollo search error', { searchId, status, error: msg, responseData: apolloErr.response?.data });
       }
     }
 
@@ -101,16 +105,21 @@ async function searchProspects(query, userId) {
 
 async function _searchViaApollo({ industries, locations, titles, keywords }, config) {
   const body = {
-    person_titles: (titles || []).slice(0, 5),
-    q_organization_locations: (locations || []).slice(0, 3),
-    q_organization_industries: (industries || []).slice(0, 5),
-    q_keywords: (keywords || []).join(' ') || undefined,
-    num_requested: 25,
+    per_page: 25,
     page: 1,
   };
 
+  if (titles && titles.length)     body.person_titles = titles.slice(0, 5);
+  if (locations && locations.length) body.person_locations = locations.slice(0, 5);
+  if (industries && industries.length) body.q_organization_keyword_tags = industries.slice(0, 5);
+
+  const kw = (keywords || []).join(' ').trim();
+  if (kw) body.q_keywords = kw;
+
+  logger.info('Apollo search request', { body });
+
   const res = await axios.post('https://api.apollo.io/v1/people/search', body, {
-    timeout: 10000,
+    timeout: 15000,
     headers: {
       'Content-Type': 'application/json',
       'X-Api-Key': config.APOLLO_API_KEY,
@@ -118,6 +127,11 @@ async function _searchViaApollo({ industries, locations, titles, keywords }, con
   });
 
   const people = res.data?.people || [];
+  logger.info('Apollo search response', {
+    total: res.data?.pagination?.total_entries,
+    returned: people.length,
+  });
+
   return people
     .filter(p => p.first_name || p.last_name || p.organization?.name)
     .map(p => ({
