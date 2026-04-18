@@ -60,6 +60,10 @@ async function searchProspects(query, userId) {
       try {
         const apolloResults = await _searchViaApollo({ industries, locations, titles, keywords }, config);
         results = results.concat(apolloResults);
+        const maskedCount = apolloResults.filter(p => p.email_masked).length;
+        if (maskedCount > 0) {
+          warnings.push(`${maskedCount} Apollo result(s) have masked emails — upgrade your Apollo plan or enrich manually to unlock them`);
+        }
       } catch (apolloErr) {
         const msg = apolloErr.response?.data?.message || apolloErr.response?.data?.error || apolloErr.message;
         warnings.push(`Apollo search failed: ${msg}`);
@@ -115,11 +119,12 @@ async function _searchViaApollo({ industries, locations, titles, keywords }, con
 
   const people = res.data?.people || [];
   return people
-    .filter(p => p.email && !p.email.includes('*'))
+    .filter(p => p.first_name || p.last_name || p.organization?.name)
     .map(p => ({
       first_name: p.first_name || null,
       last_name: p.last_name || null,
-      email: p.email,
+      email: (p.email && p.email.includes('*')) ? null : (p.email || null),
+      email_masked: !!(p.email && p.email.includes('*')),
       title: p.title || null,
       company_name: p.organization?.name || null,
       industry: p.organization?.industry || null,
