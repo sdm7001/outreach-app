@@ -2013,7 +2013,7 @@ async function loadProspectPool() {
         <div style="display:flex;align-items:center;gap:10px;min-width:0">
           <input type="checkbox" style="width:auto;padding:0;border:none;flex-shrink:0" onchange="togglePoolSelect('${esc(r.id)}',this.checked)" ${_poolSelected.has(r.id)?'checked':''}>
           <div style="min-width:0">
-            <div class="row-name">${esc((r.first_name||'') + ' ' + (r.last_name||''))}</div>
+            <div class="row-name" style="cursor:pointer;color:#2563eb;text-decoration:underline" onclick="showProspectDetail('${esc(r.id)}')">${esc((r.first_name||'') + ' ' + (r.last_name||''))}</div>
             <div class="row-sub">${esc(r.title||'')}${r.title&&r.company_name?' @ ':''}${esc(r.company_name||'')} · ${esc(r.email||'—')}</div>
             <div class="row-sub">${esc(r.source||'')} · ${fmt(r.created_at)}</div>
           </div>
@@ -2152,6 +2152,50 @@ async function saveAddProspect() {
   } catch(e) { document.getElementById('addp-alert').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
 }
 
+async function showProspectDetail(id) {
+  try {
+    const p = await apiFetch('/prospects/' + id);
+    const name = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+    const field = (label, val, href) => {
+      const disp = href ? '<a href="'+href+'" target="_blank" style="color:#2563eb">'+esc(val)+'</a>' : esc(val||'—');
+      return '<div style="margin-bottom:2px"><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">'+label+'</div><div style="font-size:14px;color:#0f172a">'+disp+'</div></div>';
+    };
+    const loc = [p.city,p.state,p.country].filter(Boolean).join(', ');
+    const rows = [
+      field('Title', p.title),
+      field('Company', p.company_name),
+      field('Email', p.email, p.email?'mailto:'+p.email:null),
+      field('Industry', p.industry),
+      field('Location', loc||null),
+      field('Source', p.source),
+      p.phone ? field('Phone', p.phone) : '',
+      p.linkedin_url ? field('LinkedIn', 'View Profile', p.linkedin_url) : '',
+      field('Added', fmt(p.created_at)),
+      field('Updated', fmt(p.updated_at)),
+    ].filter(Boolean).join('');
+    const notes = p.notes ? '<div style="background:#f8fafc;border-radius:8px;padding:10px;margin:14px 0"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px">NOTES</div><div style="font-size:13px;white-space:pre-wrap">'+esc(p.notes)+'</div></div>' : '';
+    const aBtn = p.status!=='assigned' ? '<button class="btn btn-success" onclick="acceptProspectFromDetail(\x27'+id+'\x27)">Accept</button>' : '';
+    const rBtn = p.status!=='assigned' ? '<button class="btn btn-danger-outline" onclick="rejectProspectFromDetail(\x27'+id+'\x27)">Reject</button>' : '';
+    document.getElementById('modal-body').innerHTML =
+      '<div class="modal-title" style="display:flex;align-items:center;justify-content:space-between"><span>'+esc(name)+'</span><span class="badge '+badgeClass(p.status)+'">'+esc(p.status)+'</span></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'+rows+'</div>'+
+      notes+'<div id="detail-alert"></div>'+
+      '<div class="modal-actions" style="flex-wrap:wrap;gap:8px">'+
+        '<button class="btn btn-secondary" onclick="closeModal()">Close</button>'+
+        '<button class="btn btn-outline" onclick="closeModal();showEditProspectModal(\x27'+id+'\x27)">Edit</button>'+
+        aBtn+rBtn+
+      '</div>';
+    document.getElementById('overlay').style.display = 'flex';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+async function acceptProspectFromDetail(id) {
+  try { await apiFetch('/prospects/'+id+'/accept',{method:'POST'}); closeModal(); showToast('Accepted'); loadProspectPool(); }
+  catch(e) { document.getElementById('detail-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>'; }
+}
+async function rejectProspectFromDetail(id) {
+  try { await apiFetch('/prospects/'+id+'/reject',{method:'POST'}); closeModal(); showToast('Rejected'); loadProspectPool(); }
+  catch(e) { document.getElementById('detail-alert').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>'; }
+}
 async function showEditProspectModal(id) {
   try {
     const p = await apiFetch('/prospects/' + id);

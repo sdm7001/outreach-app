@@ -31,6 +31,10 @@ async function searchProspects(query, userId) {
     titles = [],
     keywords = [],
     source = 'apollo',
+    icp_preset = null,
+    keyword_batch = null,
+    employee_min = null,
+    employee_max = null,
   } = typeof query === 'string' ? {} : (query || {});
 
   const searchId = uuidv4();
@@ -58,7 +62,7 @@ async function searchProspects(query, userId) {
 
     if (apolloRequested && config.APOLLO_API_KEY) {
       try {
-        const apolloResults = await _searchViaApollo({ industries, locations, titles, keywords }, config);
+        const apolloResults = await _searchViaApollo({ industries, locations, titles, keywords, icp_preset, keyword_batch, employee_min, employee_max }, config);
         results = results.concat(apolloResults);
         const maskedCount = apolloResults.filter(p => p.email_masked).length;
         if (maskedCount > 0) {
@@ -103,49 +107,85 @@ async function searchProspects(query, userId) {
   }
 }
 
-async function _searchViaApollo({ industries, locations, titles, keywords }, config) {
-  const body = {
-    per_page: 25,
-    page: 1,
-  };
 
-  if (titles && titles.length)     body.person_titles = titles.slice(0, 5);
-  if (locations && locations.length) body.person_locations = locations.slice(0, 5);
-  if (industries && industries.length) body.q_organization_keyword_tags = industries.slice(0, 5);
+// ── ICP 1 PRESET – TexMG MSP (Houston, TX) ──────────────────────────────
+const ICP1_INDUSTRIES = [
+  "information technology and services",
+  "computer & network security",
+  "computer networking",
+  "hospital & health care",
+  "legal services",
+  "accounting",
+  "financial services",
+  "oil & energy",
+  "civil engineering",
+  "construction",
+  "consumer services",
+  "facilities services",
+];
+const ICP1_TITLES = [
+  "owner","founder","ceo","president","managing partner",
+  "office manager","practice manager","it manager","it director",
+  "operations manager","coo",
+];
+const ICP1_LOCATION = "Houston, Texas, United States";
+const ICP1_KEYWORD_BATCHES = [
+  ["information technology","managed services","IT services","IT support","technical support","help desk"],
+  ["cybersecurity","network security","information security","security services","cyber defense"],
+  ["cloud computing","cloud services","cloud infrastructure","network infrastructure","data center"],
+  ["HIPAA compliance","regulatory compliance","healthcare IT","legal technology","financial services technology"],
+];
 
-  const kw = (keywords || []).join(' ').trim();
-  if (kw) body.q_keywords = kw;
+async function _searchViaApollo({ industries, locations, titles, keywords, icp_preset, keyword_batch, employee_min, employee_max }, config) {
+  const body = { per_page: 25, page: 1 };
 
-  logger.info('Apollo search request', { body });
+  if (icp_preset === "icp1") {
+    body.q_organization_keyword_tags      = ICP1_INDUSTRIES;
+    body.q_organization_locations         = [ICP1_LOCATION];
+    body.organization_num_employees_ranges = ["10,200"];
+    body.person_titles                    = ICP1_TITLES;
+    const batchIdx = (typeof keyword_batch === "number" && keyword_batch >= 0 && keyword_batch <= 3)
+      ? keyword_batch : null;
+    if (batchIdx !== null) body.q_keywords = ICP1_KEYWORD_BATCHES[batchIdx].join(" ");
+  } else {
+    if (titles && titles.length)         body.person_titles = titles.slice(0, 11);
+    if (locations && locations.length)   body.q_organization_locations = locations.slice(0, 5);
+    if (industries && industries.length) body.q_organization_keyword_tags = industries.slice(0, 12);
+    if (employee_min || employee_max)    body.organization_num_employees_ranges = [String(employee_min||1)+","+String(employee_max||10000)];
+    const kw = (keywords || []).join(" ").trim();
+    if (kw && kw.length <= 250) body.q_keywords = kw;
+  }
 
-  const res = await axios.post('https://api.apollo.io/v1/people/search', body, {
+  logger.info("Apollo search request", { body });
+
+  const res = await axios.post("https://api.apollo.io/api/v1/mixed_people/api_search", body, {
     timeout: 15000,
     headers: {
-      'Content-Type': 'application/json',
-      'X-Api-Key': config.APOLLO_API_KEY,
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      "x-api-key": config.APOLLO_API_KEY,
     },
   });
 
+  const total = res.data?.pagination?.total_entries || res.data?.total_entries || 0;
   const people = res.data?.people || [];
-  logger.info('Apollo search response', {
-    total: res.data?.pagination?.total_entries,
-    returned: people.length,
-  });
+  logger.info("Apollo search response", { total, returned: people.length });
 
   return people
     .filter(p => p.first_name || p.last_name || p.organization?.name)
     .map(p => ({
-      first_name: p.first_name || null,
-      last_name: p.last_name || null,
-      email: (p.email && p.email.includes('*')) ? null : (p.email || null),
-      email_masked: !!(p.email && p.email.includes('*')),
-      title: p.title || null,
-      company_name: p.organization?.name || null,
-      industry: p.organization?.industry || null,
-      city: p.city || null,
-      state: p.state || null,
-      country: p.country || null,
-      source: 'apollo',
+      first_name:      p.first_name || null,
+      last_name:       p.last_name || null,
+      email:           (p.email && p.email.includes("*")) ? null : (p.email || null),
+      email_masked:    !!(p.email && p.email.includes("*")),
+      title:           p.title || null,
+      company_name:    p.organization?.name || null,
+      industry:        p.organization?.industry || null,
+      city:            p.city || null,
+      state:           p.state || null,
+      country:         p.country || null,
+      source:          "apollo",
+      _total_available: total,
     }));
 }
 
