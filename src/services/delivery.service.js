@@ -74,7 +74,7 @@ function injectUnsubscribeLink(body, unsubscribeUrl, companyAddress) {
   return body.replace('{{UNSUBSCRIBE_URL}}', `<a href="${unsubscribeUrl}">Unsubscribe</a>`) + footer;
 }
 
-async function sendEmail({ contactId, campaignId, stepId, draftId, recipientEmail, subject, body, fromName, fromEmail }) {
+async function sendEmail({ contactId, campaignId, stepId, draftId, recipientEmail, subject, body, fromName, fromEmail, attachments = [] }) {
   const config = getConfig();
   const db = getDb();
 
@@ -118,6 +118,7 @@ async function sendEmail({ contactId, campaignId, stepId, draftId, recipientEmai
       to: recipientEmail,
       subject,
       html: trackedBody,
+      attachments: attachments.length ? attachments : undefined,
     });
 
     db.prepare(`UPDATE send_events SET status = 'sent', sent_at = ? WHERE id = ?`)

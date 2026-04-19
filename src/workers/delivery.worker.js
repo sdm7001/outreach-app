@@ -3,6 +3,7 @@
 const { getDb } = require('../db');
 const { getConfig } = require('../config');
 const { sendEmail } = require('../services/delivery.service');
+const { generateAuditReportPDF } = require('../services/audit-report.service');
 const { isSuppress } = require('../services/compliance.service');
 const logger = require('../utils/logger');
 
@@ -70,6 +71,36 @@ async function deliveryHandler(payload) {
     return;
   }
 
+  // Generate PDF audit report attachment if a website audit exists for this draft
+  let attachments = [];
+  if (draft.website_audit_id) {
+    try {
+      const audit = db.prepare('SELECT * FROM website_audits WHERE id = ?').get(draft.website_audit_id);
+      if (audit && audit.status === 'completed') {
+        const intel = draft.prospect_intelligence_id
+          ? db.prepare('SELECT * FROM prospect_intelligence WHERE id = ?').get(draft.prospect_intelligence_id)
+          : null;
+        const pdfBuffer = await generateAuditReportPDF({
+          audit,
+          intel,
+          senderName: config.FROM_NAME || 'Scott',
+          senderCompany: config.COMPANY_NAME || 'TexMG',
+          senderEmail: config.FROM_EMAIL || '',
+        });
+        const companySlug = (audit.company_name || audit.domain || 'company')
+          .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        attachments.push({
+          filename: `${companySlug}-website-audit.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        });
+        logger.info('Delivery: audit report PDF attached', { draftId: draft.id, domain: audit.domain });
+      }
+    } catch (pdfErr) {
+      logger.warn('Delivery: PDF generation failed, sending without attachment', { draftId: draft.id, error: pdfErr.message });
+    }
+  }
+
   await sendEmail({
     contactId,
     campaignId,
@@ -78,6 +109,7 @@ async function deliveryHandler(payload) {
     recipientEmail: contact.email,
     subject: draft.subject,
     body: draft.body,
+    attachments,
   });
 }
 
