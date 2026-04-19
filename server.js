@@ -70,6 +70,7 @@ app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/suppression', suppressionRouter);
 app.use('/api/v1/audit', auditRouter);
+app.use('/api/v1/website-audits', require('./src/api/website-audits'));
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/sender-profiles', senderProfilesRouter);
 

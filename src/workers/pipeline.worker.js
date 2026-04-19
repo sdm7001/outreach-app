@@ -3,6 +3,7 @@
 const { getDb } = require('../db');
 const { getConfig } = require('../config');
 const { generateWithRetry } = require('../services/message.service');
+const { auditWebsite } = require('../services/website-audit.service');
 const { isSuppress } = require('../services/compliance.service');
 const { enqueue } = require('./queue');
 const logger = require('../utils/logger');
@@ -48,10 +49,31 @@ async function pipelineHandler(payload) {
     return;
   }
 
+  // Run website audit for personalization (non-blocking — failure skips audit, doesn't fail job)
+  let websiteAuditId = null;
+  const account = contact.account_id
+    ? db.prepare('SELECT domain, company_name, industry FROM accounts WHERE id = ?').get(contact.account_id)
+    : null;
+  const domain = account?.domain || null;
+
+  if (domain) {
+    try {
+      const audit = await auditWebsite({
+        domain,
+        companyName: account.company_name,
+        industry: account.industry,
+        contactId,
+      });
+      websiteAuditId = audit?.id || null;
+    } catch (auditErr) {
+      logger.warn('Pipeline: website audit failed, continuing without it', { contactId, domain, error: auditErr.message });
+    }
+  }
+
   // Generate draft
   let draft;
   try {
-    draft = await generateWithRetry({ contactId, campaignId, stepId: step.id }, 3);
+    draft = await generateWithRetry({ contactId, campaignId, stepId: step.id, websiteAuditId }, 3);
   } catch (err) {
     logger.error('Pipeline: message generation failed', { contactId, error: err.message });
     throw err; // Will cause job retry

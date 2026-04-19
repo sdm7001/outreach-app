@@ -1723,24 +1723,50 @@ async function loadDrafts(){
     const rows=d.data||[];
     document.getElementById('review-count').textContent=rows.length+' drafts';
     if(!rows.length){document.getElementById('drafts-list').innerHTML='<div class="empty">No drafts in this status.</div>';return;}
-    document.getElementById('drafts-list').innerHTML=rows.map(r=>`
-      <div class="card">
+    document.getElementById('drafts-list').innerHTML=rows.map(r=>{
+      let auditBadge='';
+      let auditPanel='';
+      if(r.audit_overall_score!=null){
+        const sc=r.audit_overall_score;
+        const col=sc>=70?'#16a34a':sc>=50?'#d97706':'#dc2626';
+        auditBadge=`<span style="font-size:11px;background:#1e293b;color:${col};border:1px solid ${col};padding:2px 7px;border-radius:4px;margin-left:8px" title="Website audit score">&#128202; Audit ${sc}/100</span>`;
+        if(r.audit_findings){
+          try{
+            const f=JSON.parse(r.audit_findings);
+            const hooks=(f.email_hooks||[]).map(h=>`<li>${esc(h)}</li>`).join('');
+            const summary=f.summary?`<p style="margin:0 0 6px;font-style:italic">${esc(f.summary)}</p>`:'';
+            auditPanel=`<details style="margin-top:10px;font-size:12px">
+              <summary style="cursor:pointer;color:#60a5fa;user-select:none">View website audit report (${esc(r.audit_domain||'')})</summary>
+              <div style="margin-top:8px;padding:10px;background:#0f172a;border-radius:6px;line-height:1.6">
+                ${summary}
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+                  ${[['Content',f.content_score],['Conversion',f.conversion_score],['SEO',f.seo_score],['Competitive',f.competitive_score],['Brand',f.brand_score],['Growth',f.growth_score]].map(([l,v])=>`<div style="background:#1e293b;padding:6px 8px;border-radius:4px"><div style="font-size:10px;color:#94a3b8">${l}</div><div style="font-weight:600;color:#f1f5f9">${v!=null?v:'—'}</div></div>`).join('')}
+                </div>
+                ${hooks?`<div style="color:#94a3b8;margin-bottom:4px">Email hooks used:</div><ul style="margin:0;padding-left:16px;color:#e2e8f0">${hooks}</ul>`:''}
+              </div>
+            </details>`;
+          }catch(_){}
+        }
+      }
+      return`<div class="card">
         <div class="card-head">
           <div>
-            <div class="card-head-title">${esc(r.subject||'(no subject)')}</div>
-            <div style="font-size:12px;color:#94a3b8">${fmt(r.created_at)} &bull; Model: ${esc(r.ai_model||'—')}</div>
+            <div class="card-head-title">${esc(r.subject||'(no subject)')}${auditBadge}</div>
+            <div style="font-size:12px;color:#94a3b8">${fmt(r.created_at)} &bull; ${esc(r.first_name||'')} ${esc(r.last_name||'')} @ ${esc(r.company_name||'—')} &bull; Model: ${esc(r.ai_model||'—')}</div>
           </div>
           <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span>
         </div>
         <div class="card-body">
           <div class="draft-body">${esc(r.body||'').substring(0,400)}${r.body&&r.body.length>400?'…':''}</div>
           ${r.spam_score>0?'<div style="font-size:12px;color:#d97706;margin-top:8px">⚠ Spam score: '+r.spam_score+'</div>':''}
+          ${auditPanel}
           ${r.status==='pending_review'?`<div class="modal-actions" style="margin-top:12px">
             <button class="btn btn-success" onclick="approveDraft('${esc(r.id)}')">Approve &amp; Send</button>
             <button class="btn btn-danger-outline" onclick="rejectDraft('${esc(r.id)}')">Reject</button>
           </div>`:''}
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }catch(e){document.getElementById('drafts-list').innerHTML='<div class="alert alert-error">'+esc(e.message)+'</div>';}
 }
 

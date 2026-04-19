@@ -525,6 +525,42 @@ const MIGRATIONS = [
       }
     }
   },
+  {
+    version: 11,
+    description: 'Website audits for personalized outreach',
+    up(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS website_audits (
+          id TEXT PRIMARY KEY,
+          prospect_id TEXT,
+          contact_id TEXT,
+          company_name TEXT,
+          domain TEXT NOT NULL,
+          url TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'pending',
+          content_score INTEGER,
+          conversion_score INTEGER,
+          seo_score INTEGER,
+          competitive_score INTEGER,
+          brand_score INTEGER,
+          growth_score INTEGER,
+          overall_score INTEGER,
+          findings TEXT DEFAULT '{}',
+          raw_page_text TEXT,
+          error_message TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_website_audits_domain ON website_audits(domain);
+        CREATE INDEX IF NOT EXISTS idx_website_audits_contact ON website_audits(contact_id);
+      `);
+
+      const draftCols = db.prepare('PRAGMA table_info(message_drafts)').all().map(c => c.name);
+      if (!draftCols.includes('website_audit_id')) {
+        db.exec('ALTER TABLE message_drafts ADD COLUMN website_audit_id TEXT');
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {

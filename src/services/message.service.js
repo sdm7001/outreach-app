@@ -39,7 +39,7 @@ function checkSpamScore(subject, body) {
   return { score: Math.min(score, 100), triggers };
 }
 
-async function generateDraft(contactId, campaignId, stepId, promptVersion) {
+async function generateDraft(contactId, campaignId, stepId, promptVersion, websiteAuditId) {
   const db = getDb();
   const config = getConfig();
 
@@ -82,18 +82,37 @@ async function generateDraft(contactId, campaignId, stepId, promptVersion) {
   };
   const pain = painMap[angle] || painMap['it-downtime'];
 
+  // Load website audit findings if available
+  let auditContext = '';
+  if (websiteAuditId) {
+    const audit = db.prepare('SELECT * FROM website_audits WHERE id = ?').get(websiteAuditId);
+    if (audit && audit.status === 'completed' && audit.findings) {
+      try {
+        const findings = JSON.parse(audit.findings);
+        const hooks = findings.email_hooks || [];
+        const summary = findings.summary || '';
+        if (hooks.length || summary) {
+          auditContext = `\nWebsite audit findings for ${company} (score: ${audit.overall_score}/100):\n`;
+          if (summary) auditContext += `- ${summary}\n`;
+          hooks.forEach(h => { auditContext += `- ${h}\n`; });
+          auditContext += 'Use 1-2 of these specific observations to make the email feel researched, not generic.\n';
+        }
+      } catch (_) { /* ignore parse error */ }
+    }
+  }
+
   const systemPrompt = `You are an expert B2B cold email writer for a managed IT services and AI automation company. Your emails are concise (under 150 words), personalized, professional, and never use spam trigger words. Always include a clear call-to-action. Tone: ${tone}.`;
 
   const userPrompt = subjectHint && bodyHint
-    ? `Generate a cold email using this subject template: "${subjectHint}" and body template: "${bodyHint}". Personalize for: First Name: ${firstName}, Company: ${company}, Industry: ${industry}, Title: ${title}, Pain Point: ${pain}. Sender: ${senderName} from ${senderCompany}. Include {{UNSUBSCRIBE_URL}} at the end. Return JSON: {"subject": "...", "body": "..."}`
+    ? `Generate a cold email using this subject template: "${subjectHint}" and body template: "${bodyHint}". Personalize for: First Name: ${firstName}, Company: ${company}, Industry: ${industry}, Title: ${title}, Pain Point: ${pain}.${auditContext} Sender: ${senderName} from ${senderCompany}. Include {{UNSUBSCRIBE_URL}} at the end. Return JSON: {"subject": "...", "body": "..."}`
     : `Generate a personalized cold email for:
 - First Name: ${firstName}
 - Company: ${company}
 - Industry: ${industry}
 - Title: ${title}
 - Pain point to address: ${pain}
-Sender: ${senderName} from ${senderCompany} (AI automation + managed IT services, website: ${talosWebsite})
-Requirements: Under 150 words, specific to their industry, no generic phrases, clear next step CTA, include {{UNSUBSCRIBE_URL}} on last line.
+${auditContext}Sender: ${senderName} from ${senderCompany} (AI automation + managed IT services, website: ${talosWebsite})
+Requirements: Under 150 words, specific to their industry, no generic phrases, reference something specific about their business if audit findings are provided, clear next step CTA, include {{UNSUBSCRIBE_URL}} on last line.
 Return valid JSON only: {"subject": "...", "body": "..."}`;
 
   if (!config.ANTHROPIC_API_KEY) {
@@ -102,7 +121,7 @@ Return valid JSON only: {"subject": "...", "body": "..."}`;
     return saveDraft(db, contactId, campaignId, stepId, {
       subject: `Quick question for ${company}`,
       body: `Hi ${firstName},\n\nI noticed ${company} is in the ${industry} space and wanted to reach out about ${pain}.\n\nWe help companies like yours with managed IT and AI automation. Would you have 15 minutes this week to discuss?\n\nBest,\n${senderName}\n\n{{UNSUBSCRIBE_URL}}`,
-    }, config.AI_MODEL, promptVersion || 'v1');
+    }, config.AI_MODEL, promptVersion || 'v1', websiteAuditId);
   }
 
   const Anthropic = require('@anthropic-ai/sdk');
@@ -130,18 +149,18 @@ Return valid JSON only: {"subject": "...", "body": "..."}`;
     };
   }
 
-  return saveDraft(db, contactId, campaignId, stepId, parsed, config.AI_MODEL, promptVersion || config.AI_PROMPT_VERSION);
+  return saveDraft(db, contactId, campaignId, stepId, parsed, config.AI_MODEL, promptVersion || config.AI_PROMPT_VERSION, websiteAuditId);
 }
 
-function saveDraft(db, contactId, campaignId, stepId, { subject, body }, aiModel, promptVersion) {
+function saveDraft(db, contactId, campaignId, stepId, { subject, body }, aiModel, promptVersion, websiteAuditId) {
   const spamResult = checkSpamScore(subject, body);
   const id = uuidv4();
   const now = new Date().toISOString();
 
   db.prepare(`
-    INSERT INTO message_drafts (id, contact_id, campaign_id, sequence_step_id, subject, body, ai_model, prompt_version, spam_score, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_review', ?)
-  `).run(id, contactId, campaignId || null, stepId || null, subject, body, aiModel, promptVersion, spamResult.score, now);
+    INSERT INTO message_drafts (id, contact_id, campaign_id, sequence_step_id, subject, body, ai_model, prompt_version, spam_score, website_audit_id, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_review', ?)
+  `).run(id, contactId, campaignId || null, stepId || null, subject, body, aiModel, promptVersion, spamResult.score, websiteAuditId || null, now);
 
   logger.info('Draft generated', { draftId: id, contactId, spamScore: spamResult.score });
   return getDraft(id);
@@ -151,10 +170,14 @@ function getDraft(id) {
   const db = getDb();
   const row = db.prepare(`
     SELECT d.*, c.first_name, c.last_name, c.email as contact_email, c.title,
-           a.company_name
+           a.company_name,
+           wa.overall_score as audit_overall_score,
+           wa.findings as audit_findings,
+           wa.domain as audit_domain
     FROM message_drafts d
     JOIN contacts c ON c.id = d.contact_id
     LEFT JOIN accounts a ON a.id = c.account_id
+    LEFT JOIN website_audits wa ON wa.id = d.website_audit_id
     WHERE d.id = ?
   `).get(id);
   if (!row) throw new NotFoundError(`Draft ${id} not found`);
@@ -174,10 +197,13 @@ function listDrafts({ status, campaign_id, page = 1, limit = 20 } = {}) {
   const total = db.prepare(`SELECT COUNT(*) as cnt FROM message_drafts d ${where}`).get(...params).cnt;
 
   const rows = db.prepare(`
-    SELECT d.*, c.first_name, c.last_name, c.email as contact_email, c.title, a.company_name
+    SELECT d.*, c.first_name, c.last_name, c.email as contact_email, c.title, a.company_name,
+           wa.overall_score as audit_overall_score, wa.domain as audit_domain,
+           wa.findings as audit_findings
     FROM message_drafts d
     JOIN contacts c ON c.id = d.contact_id
     LEFT JOIN accounts a ON a.id = c.account_id
+    LEFT JOIN website_audits wa ON wa.id = d.website_audit_id
     ${where}
     ORDER BY d.created_at DESC
     LIMIT ? OFFSET ?
@@ -215,7 +241,7 @@ async function generateWithRetry(params, maxRetries = 3) {
   let lastErr;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      return await generateDraft(params.contactId, params.campaignId, params.stepId, params.promptVersion);
+      return await generateDraft(params.contactId, params.campaignId, params.stepId, params.promptVersion, params.websiteAuditId);
     } catch (err) {
       lastErr = err;
       if (attempt < maxRetries) {
