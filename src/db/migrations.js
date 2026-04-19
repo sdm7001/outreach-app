@@ -561,6 +561,43 @@ const MIGRATIONS = [
       }
     }
   },
+  {
+    version: 12,
+    description: 'Prospect intelligence for personalized appointment-getting',
+    up(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS prospect_intelligence (
+          id TEXT PRIMARY KEY,
+          contact_id TEXT,
+          prospect_id TEXT,
+          first_name TEXT,
+          last_name TEXT,
+          title TEXT,
+          company_name TEXT,
+          industry TEXT,
+          status TEXT NOT NULL DEFAULT 'pending',
+          role_profile TEXT,
+          pain_points TEXT DEFAULT '[]',
+          appointment_angle TEXT,
+          recommended_tone TEXT,
+          conversation_openers TEXT DEFAULT '[]',
+          objection_handling TEXT DEFAULT '[]',
+          personalization_notes TEXT,
+          full_brief TEXT DEFAULT '{}',
+          error_message TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_prospect_intel_contact ON prospect_intelligence(contact_id);
+        CREATE INDEX IF NOT EXISTS idx_prospect_intel_prospect ON prospect_intelligence(prospect_id);
+      `);
+
+      const draftCols = db.prepare('PRAGMA table_info(message_drafts)').all().map(c => c.name);
+      if (!draftCols.includes('prospect_intelligence_id')) {
+        db.exec('ALTER TABLE message_drafts ADD COLUMN prospect_intelligence_id TEXT');
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {

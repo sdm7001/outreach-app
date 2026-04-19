@@ -1726,17 +1726,40 @@ async function loadDrafts(){
     document.getElementById('drafts-list').innerHTML=rows.map(r=>{
       let auditBadge='';
       let auditPanel='';
+      // Prospect intelligence panel
+      let intelPanel='';
+      if(r.intel_full_brief){
+        try{
+          const b=JSON.parse(r.intel_full_brief);
+          const tone=r.intel_tone?`<span style="font-size:11px;background:#1e293b;color:#a78bfa;border:1px solid #a78bfa;padding:2px 7px;border-radius:4px;margin-left:6px">&#129504; ${esc(r.intel_tone.replace(/_/g,' '))}</span>`:'';
+          auditBadge+=tone;
+          const pains=(b.pain_points||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+          const openers=(b.conversation_openers||[]).map(o=>`<li style="margin-bottom:4px">${esc(o)}</li>`).join('');
+          const objections=(b.objection_handling||[]).map(o=>`<li>${esc(o)}</li>`).join('');
+          intelPanel=`<details style="margin-top:8px;font-size:12px">
+            <summary style="cursor:pointer;color:#a78bfa;user-select:none">&#129504; Prospect intelligence brief</summary>
+            <div style="margin-top:8px;padding:10px;background:#0f172a;border-radius:6px;line-height:1.6;color:#e2e8f0">
+              ${b.role_profile?`<p style="margin:0 0 8px;color:#94a3b8;font-style:italic">${esc(b.role_profile)}</p>`:''}
+              ${b.appointment_angle?`<div style="margin-bottom:8px"><span style="color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Best appointment angle</span><div style="margin-top:3px">${esc(b.appointment_angle)}</div></div>`:''}
+              ${pains?`<div style="margin-bottom:8px"><span style="color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Top pain points</span><ul style="margin:3px 0 0;padding-left:16px">${pains}</ul></div>`:''}
+              ${openers?`<div style="margin-bottom:8px"><span style="color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Suggested openers</span><ul style="margin:3px 0 0;padding-left:16px">${openers}</ul></div>`:''}
+              ${objections?`<div><span style="color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Objection preempts</span><ul style="margin:3px 0 0;padding-left:16px">${objections}</ul></div>`:''}
+            </div>
+          </details>`;
+        }catch(_){}
+      }
+      // Website audit panel
       if(r.audit_overall_score!=null){
         const sc=r.audit_overall_score;
         const col=sc>=70?'#16a34a':sc>=50?'#d97706':'#dc2626';
-        auditBadge=`<span style="font-size:11px;background:#1e293b;color:${col};border:1px solid ${col};padding:2px 7px;border-radius:4px;margin-left:8px" title="Website audit score">&#128202; Audit ${sc}/100</span>`;
+        auditBadge=`<span style="font-size:11px;background:#1e293b;color:${col};border:1px solid ${col};padding:2px 7px;border-radius:4px;margin-left:8px" title="Website audit score">&#128202; Audit ${sc}/100</span>`+auditBadge;
         if(r.audit_findings){
           try{
             const f=JSON.parse(r.audit_findings);
             const hooks=(f.email_hooks||[]).map(h=>`<li>${esc(h)}</li>`).join('');
             const summary=f.summary?`<p style="margin:0 0 6px;font-style:italic">${esc(f.summary)}</p>`:'';
-            auditPanel=`<details style="margin-top:10px;font-size:12px">
-              <summary style="cursor:pointer;color:#60a5fa;user-select:none">View website audit report (${esc(r.audit_domain||'')})</summary>
+            auditPanel=`<details style="margin-top:8px;font-size:12px">
+              <summary style="cursor:pointer;color:#60a5fa;user-select:none">&#128202; Website audit report (${esc(r.audit_domain||'')})</summary>
               <div style="margin-top:8px;padding:10px;background:#0f172a;border-radius:6px;line-height:1.6">
                 ${summary}
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
@@ -1759,6 +1782,7 @@ async function loadDrafts(){
         <div class="card-body">
           <div class="draft-body">${esc(r.body||'').substring(0,400)}${r.body&&r.body.length>400?'…':''}</div>
           ${r.spam_score>0?'<div style="font-size:12px;color:#d97706;margin-top:8px">⚠ Spam score: '+r.spam_score+'</div>':''}
+          ${intelPanel}
           ${auditPanel}
           ${r.status==='pending_review'?`<div class="modal-actions" style="margin-top:12px">
             <button class="btn btn-success" onclick="approveDraft('${esc(r.id)}')">Approve &amp; Send</button>
