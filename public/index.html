@@ -403,6 +403,15 @@ hr{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
         <div class="card-head"><span class="card-head-title">Saved Searches</span></div>
         <div id="ps-saved-searches"><div class="spinner"></div></div>
       </div>
+
+      <!-- Auto-Prospecting Status -->
+      <div class="card" style="margin-top:8px">
+        <div class="card-head">
+          <span class="card-head-title">Auto-Prospecting <span id="ap-running-badge" style="display:none" class="badge b-pending_review">Running…</span></span>
+          <button class="btn-sm btn-primary" onclick="triggerAutoProspect()" id="ap-run-btn">Run Now</button>
+        </div>
+        <div id="ap-status"><div class="spinner"></div></div>
+      </div>
     </div>
 
     <!-- Prospect Pool -->
@@ -559,7 +568,7 @@ function nav(page){
   else if(page==='suppression') loadSuppression();
   else if(page==='audit') loadAudit();
   else if(page==='jobs') loadJobs();
-  else if(page==='prospect-search') loadSavedSearches();
+  else if(page==='prospect-search') { loadSavedSearches(); loadAutoProspectStatus(); }
   else if(page==='prospect-pool') loadProspectPool();
   else if(page==='content-review') loadContentReview();
 }
@@ -1958,6 +1967,61 @@ async function loadSavedSearches() {
       return `<div class="row-item"><div><div class="row-name">${esc(desc||'Search')}</div><div class="row-sub">${s.result_count} results · ${fmt(s.created_at)}</div></div><span class="badge ${badgeClass(s.status)}">${esc(s.status)}</span></div>`;
     }).join('') + '</div>';
   } catch(e) { document.getElementById('ps-saved-searches').innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>'; }
+}
+
+// ── AUTO-PROSPECTING ──────────────────────────────────────────────────────
+
+async function loadAutoProspectStatus() {
+  try {
+    const d = await apiFetch('/prospects/auto/status');
+    const el = document.getElementById('ap-status');
+    const badge = document.getElementById('ap-running-badge');
+    if (!el) return;
+    badge.style.display = d.running ? 'inline' : 'none';
+    document.getElementById('ap-run-btn').disabled = d.running;
+    if (!d.recent || !d.recent.length) {
+      el.innerHTML = '<div class="empty">No runs yet — click "Run Now" to start.</div>';
+      return;
+    }
+    el.innerHTML = '<div>' + d.recent.map(r => {
+      const statusColor = r.status === 'completed' ? '#16a34a' : r.status === 'failed' ? '#dc2626' : '#d97706';
+      const duration = r.finished_at
+        ? Math.round((new Date(r.finished_at) - new Date(r.started_at)) / 1000) + 's'
+        : 'running…';
+      return `<div class="row-item">
+        <div>
+          <div class="row-name" style="color:${statusColor}">● ${esc(r.status)}</div>
+          <div class="row-sub">${fmt(r.started_at)} · ${duration} · Found: ${r.prospects_found||0} · Saved: ${r.prospects_saved||0} · Skipped: ${r.prospects_skipped||0}</div>
+          ${r.error_message ? `<div class="row-sub" style="color:#dc2626">${esc(r.error_message)}</div>` : ''}
+        </div>
+        <span class="badge b-default">${esc(r.icp_preset||'icp1')}</span>
+      </div>`;
+    }).join('') + '</div>';
+  } catch(e) {
+    const el = document.getElementById('ap-status');
+    if (el) el.innerHTML = '<div class="alert alert-error">' + esc(e.message) + '</div>';
+  }
+}
+
+async function triggerAutoProspect() {
+  try {
+    document.getElementById('ap-run-btn').disabled = true;
+    await apiFetch('/prospects/auto/run', { method: 'POST', body: JSON.stringify({ icp: 'icp1' }) });
+    showToast('Auto-prospecting run started');
+    setTimeout(loadAutoProspectStatus, 2000);
+    // Poll for completion
+    const poll = setInterval(async () => {
+      const d = await apiFetch('/prospects/auto/status');
+      if (!d.running) {
+        clearInterval(poll);
+        loadAutoProspectStatus();
+        loadPool();
+      }
+    }, 5000);
+  } catch(e) {
+    alert('Error: ' + e.message);
+    document.getElementById('ap-run-btn').disabled = false;
+  }
 }
 
 // ── PROSPECT POOL ─────────────────────────────────────────────────────────

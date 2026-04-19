@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const prospectService = require('../services/prospect.service');
+const { autoProspectTick, getAutoProspectStatus } = require('../workers/auto-prospect.worker');
 const { requireAuth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/rbac');
 const { asyncHandler, ValidationError } = require('../utils/errors');
@@ -120,6 +121,23 @@ router.post('/:id/reject', requireRole('operator'), asyncHandler(async (req, res
 router.delete('/:id', requireRole('operator'), asyncHandler(async (req, res) => {
   const result = prospectService.deleteProspect(req.params.id);
   res.json(result);
+}));
+
+// ── AUTO-PROSPECTING ──────────────────────────────────────────────────────
+
+// GET /prospects/auto/status — last 10 runs + running flag
+router.get('/auto/status', asyncHandler(async (_req, res) => {
+  res.json(getAutoProspectStatus());
+}));
+
+// POST /prospects/auto/run — trigger a manual run immediately
+router.post('/auto/run', requireRole('operator'), asyncHandler(async (req, res) => {
+  const { icp = 'icp1' } = req.body;
+  // Fire and forget — run happens in background
+  autoProspectTick(icp).catch(err =>
+    require('../utils/logger').error('[AutoProspect] Manual trigger failed', { error: err.message })
+  );
+  res.json({ message: 'Auto-prospecting run started', icp });
 }));
 
 module.exports = router;

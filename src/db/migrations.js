@@ -493,6 +493,38 @@ const MIGRATIONS = [
       }
     }
   },
+  {
+    version: 10,
+    description: 'Auto-prospecting runs tracking',
+    up(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS auto_prospect_runs (
+          id TEXT PRIMARY KEY,
+          status TEXT NOT NULL DEFAULT 'running',
+          icp_preset TEXT NOT NULL DEFAULT 'icp1',
+          prospects_found INTEGER DEFAULT 0,
+          prospects_saved INTEGER DEFAULT 0,
+          prospects_skipped INTEGER DEFAULT 0,
+          error_message TEXT,
+          started_at TEXT NOT NULL DEFAULT (datetime('now')),
+          finished_at TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_auto_prospect_runs_status ON auto_prospect_runs(status, created_at);
+      `);
+
+      const poolCols = db.prepare('PRAGMA table_info(prospect_pool)').all().map(c => c.name);
+      if (!poolCols.includes('icp_score')) {
+        db.exec('ALTER TABLE prospect_pool ADD COLUMN icp_score INTEGER DEFAULT 0');
+      }
+      if (!poolCols.includes('icp_reasoning')) {
+        db.exec('ALTER TABLE prospect_pool ADD COLUMN icp_reasoning TEXT');
+      }
+      if (!poolCols.includes('auto_prospect_run_id')) {
+        db.exec('ALTER TABLE prospect_pool ADD COLUMN auto_prospect_run_id TEXT');
+      }
+    }
+  },
 ];
 
 function runMigrations(db) {
