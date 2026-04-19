@@ -232,7 +232,7 @@ async function _stageEnrichment(runId, campaignId, { dryRun, limit }) {
 
   const contacts = db.prepare(`
     SELECT id FROM contacts
-    WHERE campaign_id = ? AND email_verified = 0 AND email IS NOT NULL
+    WHERE campaign_id = ? AND (email IS NULL OR email_verified = 0)
     LIMIT ?
   `).all(campaignId, limit || 50);
 

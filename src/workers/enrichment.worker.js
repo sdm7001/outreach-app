@@ -15,7 +15,9 @@ async function enrichmentHandler(payload) {
   const { contactId } = payload;
 
   const contact = db.prepare(`
-    SELECT c.*, a.domain FROM contacts c LEFT JOIN accounts a ON a.id = c.account_id WHERE c.id = ?
+    SELECT c.*, a.domain as account_domain FROM contacts c
+    LEFT JOIN accounts a ON a.id = c.account_id
+    WHERE c.id = ?
   `).get(contactId);
 
   if (!contact) {
@@ -28,37 +30,47 @@ async function enrichmentHandler(payload) {
     return;
   }
 
-  const domain = contact.domain;
+  // Resolve domain: prefer account domain, fall back to existing email domain, then company_name
+  const domain = _resolveDomain(contact);
   if (!domain) {
-    logger.debug('Enrichment: no domain for contact', { contactId });
+    logger.info('Enrichment: cannot resolve domain for contact', {
+      contactId,
+      company: contact.company_name,
+      email: contact.email,
+    });
     return;
   }
 
-  // Try Hunter.io first
+  // Try Hunter.io first — rethrow on failure so the queue can retry the job
   if (config.HUNTER_API_KEY && contact.first_name && contact.last_name) {
-    try {
-      const result = await hunterFindEmail(
-        contact.first_name,
-        contact.last_name,
-        domain,
-        config.HUNTER_API_KEY
-      );
+    const result = await hunterFindEmail(
+      contact.first_name,
+      contact.last_name,
+      domain,
+      config.HUNTER_API_KEY
+    );
 
-      if (result) {
-        db.prepare(`
-          UPDATE contacts SET email = ?, email_source = 'hunter', email_verified = ?, score = ?, updated_at = ? WHERE id = ?
-        `).run(result.email, result.verified ? 1 : 0, result.score || 0, new Date().toISOString(), contactId);
+    if (result) {
+      db.prepare(`
+        UPDATE contacts
+        SET email = ?, email_source = 'hunter', email_verified = ?, score = ?, updated_at = ?
+        WHERE id = ?
+      `).run(result.email, result.verified ? 1 : 0, result.score || 0, new Date().toISOString(), contactId);
 
-        logger.info('Enrichment: email found via Hunter', { contactId, email: result.email, verified: result.verified });
-        return;
-      }
-    } catch (err) {
-      logger.warn('Hunter enrichment failed', { contactId, error: err.message });
+      logger.info('Enrichment: email found via Hunter', {
+        contactId,
+        email: result.email,
+        verified: result.verified,
+        score: result.score,
+      });
+      return;
     }
+
+    logger.info('Enrichment: Hunter found no match', { contactId, domain });
   }
 
-  // Fallback: guess common patterns
-  if (contact.first_name && contact.last_name && domain) {
+  // Fallback: guess first.last@domain pattern (only if no email exists yet)
+  if (!contact.email && contact.first_name && contact.last_name) {
     const firstName = contact.first_name.toLowerCase().trim();
     const lastName = contact.last_name.toLowerCase().trim();
     const guessed = `${firstName}.${lastName}@${domain}`;
@@ -71,15 +83,34 @@ async function enrichmentHandler(payload) {
   }
 }
 
-async function hunterFindEmail(firstName, lastName, domain, apiKey) {
-  const params = new URLSearchParams({
-    domain,
-    first_name: firstName,
-    last_name: lastName,
-    api_key: apiKey,
-  });
+function _resolveDomain(contact) {
+  // 1. Account domain (most reliable)
+  if (contact.account_domain && contact.account_domain.trim()) {
+    return contact.account_domain.trim().toLowerCase();
+  }
 
-  const res = await axios.get(`https://api.hunter.io/v2/email-finder?${params}`, {
+  // 2. Extract from existing (unverified) email
+  if (contact.email && contact.email.includes('@')) {
+    const parts = contact.email.split('@');
+    if (parts[1] && parts[1].includes('.')) return parts[1].toLowerCase();
+  }
+
+  // 3. Derive from company_name — strip common words and add .com heuristic
+  if (contact.company_name) {
+    const name = contact.company_name
+      .toLowerCase()
+      .replace(/\b(inc|llc|ltd|corp|co|company|group|the)\b\.?/g, '')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+    if (name.length > 2) return `${name}.com`;
+  }
+
+  return null;
+}
+
+async function hunterFindEmail(firstName, lastName, domain, apiKey) {
+  const res = await axios.get('https://api.hunter.io/v2/email-finder', {
+    params: { domain, first_name: firstName, last_name: lastName, api_key: apiKey },
     timeout: 10000,
   });
 
